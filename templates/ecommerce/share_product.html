@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Share {{ product.name }} - ShopHub{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="bg-white rounded-lg shadow-lg p-8">
+        <!-- Close Button -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold gradient-text">Share This Product</h2>
+            <a href="{% url 'ecommerce:product_detail' product.slug %}" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-2xl"></i>
+            </a>
+        </div>
+
+        <!-- Product Preview -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <div class="flex gap-6">
+                <!-- Product Image -->
+                <div class="w-24 h-24 flex-shrink-0">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover rounded">
+                    {% else %}
+                        <div class="w-full h-full bg-gray-300 rounded flex items-center justify-center">
+                            <i class="fas fa-image text-gray-400"></i>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Product Info -->
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-800">{{ product.name }}</h3>
+                    <p class="text-sm text-gray-600 mt-1">{{ product.short_description }}</p>
+                    <div class="flex items-center gap-4 mt-3">
+                        <span class="text-2xl font-bold gradient-text">${{ product.price }}</span>
+                        {% if product.original_price %}
+                            <span class="text-sm text-gray-500 line-through">${{ product.original_price }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Share Methods -->
+        <div class="space-y-4">
+            <p class="text-gray-600 font-semibold mb-4">Share this product with your friends:</p>
+
+            <!-- Direct Link Copy -->
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-600 mb-2">Direct Link</p>
+                        <div class="flex items-center gap-2 bg-gray-50 p-3 rounded">
+                            <input 
+                                type="text" 
+                                id="shareLink" 
+                                value="{{ share_url }}" 
+                                readonly 
+                                class="flex-1 bg-transparent border-0 text-sm text-gray-700 focus:outline-none"
+                            >
+                            <button 
+                                type="button"
+                                onclick="copyToClipboard()"
+                                class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-semibold smooth-transition"
+                            >
+                                <i class="fas fa-copy mr-2"></i>Copy Link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social Media Share -->
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+                <p class="text-sm text-gray-600 mb-4">Or share via social media:</p>
+                <div class="flex gap-3 flex-wrap">
+                    <!-- Facebook -->
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}" target="_blank"
+                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold smooth-transition">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Facebook</span>
+                    </a>
+
+                    <!-- Twitter -->
+                    <a href="https://twitter.com/intent/tweet?url={{ share_url }}&text={{ share_text }}" target="_blank"
+                        class="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded font-semibold smooth-transition">
+                        <i class="fab fa-twitter"></i>
+                        <span>Twitter</span>
+                    </a>
+
+                    <!-- WhatsApp -->
+                    <a href="https://wa.me/?text={{ share_text }}%20{{ share_url }}" target="_blank"
+                        class="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded font-semibold smooth-transition">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                    </a>
+
+                    <!-- Telegram -->
+                    <a href="https://t.me/share/url?url={{ share_url }}&text={{ share_text }}" target="_blank"
+                        class="flex items-center gap-2 bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded font-semibold smooth-transition">
+                        <i class="fab fa-telegram"></i>
+                        <span>Telegram</span>
+                    </a>
+
+                    <!-- Email -->
+                    <a href="mailto:?subject={{ product.name }}&body={{ share_text }}%20{{ share_url }}"
+                        class="flex items-center gap-2 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded font-semibold smooth-transition">
+                        <i class="fas fa-envelope"></i>
+                        <span>Email</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Message Preview -->
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4">
+                <p class="text-sm text-gray-600 mb-3">Message Preview:</p>
+                <div class="bg-gray-50 p-4 rounded border border-gray-200">
+                    <p class="text-gray-700 text-sm leading-relaxed">
+                        <strong>{{ share_text }}</strong><br><br>
+                        <span class="text-blue-600 hover:underline cursor-pointer" onclick="copyToClipboard()">{{ share_url }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-8">
+            <a href="{% url 'ecommerce:product_detail' product.slug %}" 
+                class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg font-semibold text-center smooth-transition">
+                Back to Product
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyToClipboard() {
+    const shareLink = document.getElementById('shareLink');
+    shareLink.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const button = event.target.closest('button');
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-check mr-2"></i>Copied!';
+    button.style.backgroundColor = '#10b981';
+    
+    setTimeout(() => {
+        button.innerHTML = originalText;
+        button.style.backgroundColor = '';
+    }, 2000);
+}
+</script>
+{% endblock %}
+

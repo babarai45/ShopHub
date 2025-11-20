@@ -110,15 +110,16 @@
                 {% csrf_token %}
                 <div class="flex items-center space-x-4">
                     <div class="flex items-center border border-gray-300 rounded-lg">
-                        <button type="button" onclick="decreaseQty()" class="px-4 py-2 text-gray-600">
+                        <button type="button" onclick="decreaseQty()" class="px-4 py-2 text-gray-600 hover:bg-gray-100">
                             <i class="fas fa-minus"></i>
                         </button>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" 
-                            class="w-16 text-center border-0 focus:outline-none">
-                        <button type="button" onclick="increaseQty()" class="px-4 py-2 text-gray-600">
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}"
+                            class="w-16 text-center border-0 focus:outline-none" onchange="validateQty()">
+                        <button type="button" onclick="increaseQty()" class="px-4 py-2 text-gray-600 hover:bg-gray-100">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
+                    <span class="text-sm text-gray-600">Max: {{ product.stock }} available</span>
                 </div>
 
                 <button type="submit" class="w-full gradient-bg text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg smooth-transition">
@@ -137,14 +138,29 @@
 
             <!-- Additional Actions -->
             <div class="mt-6 space-y-3 border-t pt-6">
-                <button class="w-full flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    <i class="fas fa-heart"></i>
-                    <span>Add to Wishlist</span>
-                </button>
-                <button class="w-full flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                {% if user.is_authenticated %}
+                    {% if user.wishlist.products.all|length > 0 and product in user.wishlist.products.all %}
+                        <a href="{% url 'ecommerce:remove_from_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 smooth-transition font-semibold">
+                            <i class="fas fa-heart"></i>
+                            <span>Remove from Wishlist</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'ecommerce:add_to_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold">
+                            <i class="far fa-heart"></i>
+                            <span>Add to Wishlist</span>
+                        </a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'ecommerce:login' %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold">
+                        <i class="far fa-heart"></i>
+                        <span>Login to Wishlist</span>
+                    </a>
+                {% endif %}
+                
+                <a href="{% url 'ecommerce:share_product' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 smooth-transition font-semibold">
                     <i class="fas fa-share-alt"></i>
                     <span>Share Product</span>
-                </button>
+                </a>
             </div>
         </div>
     </div>
@@ -175,7 +191,7 @@
                     <a href="{% url 'ecommerce:product_detail' rel_product.slug %}" class="text-lg font-semibold text-gray-800 hover:gradient-text smooth-transition block">
                         {{ rel_product.name }}
                     </a>
-                    
+
                     <!-- Rating -->
                     <div class="flex items-center gap-2 mt-2">
                         <div class="flex items-center">
@@ -195,7 +211,7 @@
                         </div>
                         <span class="text-xs text-gray-600">{{ rel_product.rating|default:"0" }}</span>
                     </div>
-                    
+
                     <!-- Price -->
                     <div class="flex items-center gap-2 mt-2">
                         <p class="text-2xl font-bold gradient-text">${{ rel_product.price }}</p>
@@ -203,7 +219,7 @@
                             <span class="text-xs text-gray-500 line-through">${{ rel_product.original_price }}</span>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Stock Info -->
                     <div class="text-xs text-gray-600 mt-2 mb-3">
                         {% if rel_product.stock > 0 %}
@@ -212,7 +228,7 @@
                             <span class="text-red-600 font-semibold">Out of stock</span>
                         {% endif %}
                     </div>
-                    
+
                     <!-- Button -->
                     <div class="space-y-2">
                         <a href="{% url 'ecommerce:product_detail' rel_product.slug %}" class="block w-full bg-white border-2 border-blue-500 text-blue-500 py-2 rounded-lg hover:bg-blue-50 smooth-transition font-semibold text-center text-sm">
@@ -247,13 +263,33 @@
 <script>
 function increaseQty() {
     const input = document.getElementById('quantity');
-    input.value = parseInt(input.value) + 1;
+    const maxStock = parseInt(input.getAttribute('max'));
+    const currentQty = parseInt(input.value);
+    
+    if (currentQty < maxStock) {
+        input.value = currentQty + 1;
+    } else {
+        alert('Cannot add more! Only ' + maxStock + ' items available in stock.');
+    }
 }
 
 function decreaseQty() {
     const input = document.getElementById('quantity');
     if (parseInt(input.value) > 1) {
         input.value = parseInt(input.value) - 1;
+    }
+}
+
+function validateQty() {
+    const input = document.getElementById('quantity');
+    const maxStock = parseInt(input.getAttribute('max'));
+    let qty = parseInt(input.value);
+    
+    if (isNaN(qty) || qty < 1) {
+        input.value = 1;
+    } else if (qty > maxStock) {
+        input.value = maxStock;
+        alert('Cannot order more than ' + maxStock + ' items. Stock limited to ' + maxStock + '.');
     }
 }
 </script>

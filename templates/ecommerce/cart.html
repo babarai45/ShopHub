@@ -35,12 +35,12 @@
 
                     <!-- Quantity -->
                     <div class="flex flex-col items-center justify-between">
-                        <form method="post" action="{% url 'ecommerce:update_cart_item' item.id %}" class="flex items-center border border-gray-300 rounded-lg">
+                        <form method="post" action="{% url 'ecommerce:update_cart_item_ajax' item.id %}" class="flex items-center border border-gray-300 rounded-lg qty-form">
                             {% csrf_token %}
                             <button type="button" onclick="decreaseQty(this)" class="px-3 py-1 text-gray-600">
                                 <i class="fas fa-minus text-sm"></i>
                             </button>
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="w-12 text-center border-0 focus:outline-none" onchange="this.form.submit()">
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="w-12 text-center border-0 focus:outline-none qty-input" onchange="updateCartAjax(this)">
                             <button type="button" onclick="increaseQty(this)" class="px-3 py-1 text-gray-600">
                                 <i class="fas fa-plus text-sm"></i>
                             </button>
@@ -91,7 +91,7 @@
                 <div class="space-y-4 border-b pb-6 mb-6">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Subtotal</span>
-                        <span class="font-semibold">${{ cart.get_total }}</span>
+                        <span class="font-semibold" data-subtotal>${{ subtotal }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
@@ -99,13 +99,13 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-semibold">${{ tax_amount }}</span>
+                        <span class="font-semibold" data-tax>${{ tax_amount }}</span>
                     </div>
                 </div>
 
                 <div class="flex justify-between mb-6 text-xl font-bold">
                     <span>Total</span>
-                    <span class="gradient-text">${{ total_amount }}</span>
+                    <span class="gradient-text" data-total>${{ total_amount }}</span>
                 </div>
 
                 {% if cart.items.all %}
@@ -151,7 +151,15 @@
 function increaseQty(button) {
     const form = button.closest('form');
     const input = form.querySelector('input[name="quantity"]');
-    input.value = parseInt(input.value) + 1;
+    const maxStock = parseInt(input.getAttribute('max'));
+    const currentQty = parseInt(input.value);
+    
+    if (currentQty < maxStock) {
+        input.value = currentQty + 1;
+        updateCartAjax(input);
+    } else {
+        alert('Cannot add more! Only ' + maxStock + ' items available in stock.');
+    }
 }
 
 function decreaseQty(button) {
@@ -159,7 +167,77 @@ function decreaseQty(button) {
     const input = form.querySelector('input[name="quantity"]');
     if (parseInt(input.value) > 1) {
         input.value = parseInt(input.value) - 1;
+        updateCartAjax(input);
     }
+}
+
+function updateCartAjax(input) {
+    const form = input.closest('form');
+    const url = form.getAttribute('action');
+    const formData = new FormData(form);
+    const maxStock = parseInt(input.getAttribute('max'));
+    const qty = parseInt(input.value);
+    
+    // Validate quantity
+    if (qty > maxStock) {
+        alert('Cannot order more than ' + maxStock + ' items. Stock limited to ' + maxStock + '.');
+        input.value = maxStock;
+        return;
+    }
+    
+    if (qty < 1) {
+        input.value = 1;
+        return;
+    }
+    
+    // Send AJAX request
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update subtotal
+            document.querySelector('[data-subtotal]').textContent = '$' + data.subtotal.toFixed(2);
+            
+            // Update tax
+            document.querySelector('[data-tax]').textContent = '$' + data.tax.toFixed(2);
+            
+            // Update total
+            document.querySelector('[data-total]').textContent = '$' + data.total.toFixed(2);
+            
+            // Update item subtotal
+            const itemTotal = input.closest('.flex').nextElementSibling;
+            if (itemTotal) {
+                input.closest('.flex-col').parentElement.querySelector('p:last-child').textContent = '$' + data.item_total.toFixed(2);
+            }
+            
+            // Show success message
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.message, 'error');
+            // Reset quantity
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating cart', 'error');
+    });
+}
+
+function showNotification(message, type) {
+    const alertClass = type === 'success' ? 'bg-green-100 text-green-700 border-green-400' : 'bg-red-100 text-red-700 border-red-400';
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'fixed top-4 right-4 p-4 rounded border ' + alertClass + ' z-50';
+    alertDiv.innerHTML = '<i class="fas fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + ' mr-2"></i>' + message;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => alertDiv.remove(), 3000);
 }
 </script>
 {% endblock %}

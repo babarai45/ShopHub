@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, UserProfile, Cart, CartItem
+from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist
 
 
 @admin.register(Category)
@@ -58,3 +58,10 @@ class CartItemAdmin(admin.ModelAdmin):
     list_filter = ('added_at',)
     search_fields = ('product__name', 'cart__user__username')
 
+
+@admin.register(Wishlist)
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at')
+    search_fields = ('user__username',)
+    readonly_fields = ('user', 'created_at', 'updated_at')
+    filter_horizontal = ('products',)

@@ -5,6 +5,8 @@ from django.contrib import messages
 from django.db.models import Q
 from .models import Product, Category, Cart, CartItem, UserProfile
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
+import json
+from django.http import JsonResponse
 
 
 def home(request):
@@ -219,3 +221,95 @@ def update_cart_item(request, cart_item_id):
 
     return redirect('ecommerce:cart')
 
+
+@login_required(login_url='ecommerce:login')
+def add_to_wishlist(request, product_id):
+    """Add product to wishlist"""
+    from .models import Wishlist
+
+    product = get_object_or_404(Product, id=product_id)
+
+    # Get or create wishlist for user
+    wishlist, created = Wishlist.objects.get_or_create(user=request.user)
+
+    if product in wishlist.products.all():
+        wishlist.products.remove(product)
+        messages.info(request, f'{product.name} removed from wishlist!')
+    else:
+        wishlist.products.add(product)
+        messages.success(request, f'{product.name} added to wishlist!')
+
+    return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
+
+@login_required(login_url='ecommerce:login')
+def remove_from_wishlist(request, product_id):
+    """Remove product from wishlist"""
+    from .models import Wishlist
+
+    product = get_object_or_404(Product, id=product_id)
+
+    try:
+        wishlist = Wishlist.objects.get(user=request.user)
+        wishlist.products.remove(product)
+        messages.success(request, f'{product.name} removed from wishlist!')
+    except Wishlist.DoesNotExist:
+        messages.error(request, 'Wishlist not found!')
+
+    return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
+
+@login_required(login_url='ecommerce:login')
+def share_product(request, product_id):
+    """Generate shareable link for product"""
+    product = get_object_or_404(Product, id=product_id)
+    from django.urls import reverse
+    product_url = request.build_absolute_uri(reverse('ecommerce:product_detail', kwargs={'slug': product.slug}))
+
+    context = {
+        'product': product,
+        'share_url': product_url,
+        'share_text': f'Check out {product.name} on ShopHub!',
+    }
+    return render(request, 'ecommerce/share_product.html', context)
+
+
+@login_required(login_url='ecommerce:login')
+def update_cart_item_ajax(request, cart_item_id):
+    """Update cart item quantity via AJAX and return updated totals"""
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        from decimal import Decimal
+
+        cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
+        quantity = int(request.POST.get('quantity', 1))
+
+        # Validate quantity against stock
+        if quantity > cart_item.product.stock:
+            return JsonResponse({
+                'success': False,
+                'message': f'Only {cart_item.product.stock} items available in stock!'
+            })
+
+        if quantity > 0:
+            cart_item.quantity = quantity
+            cart_item.save()
+        else:
+            return JsonResponse({'success': False, 'message': 'Quantity must be at least 1'})
+
+        # Calculate new totals
+        cart = cart_item.cart
+        subtotal = Decimal(str(cart.get_total()))
+        shipping = Decimal('5.00')
+        tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+        total_amount = subtotal + shipping + tax_amount
+
+        return JsonResponse({
+            'success': True,
+            'item_total': float(cart_item.get_total()),
+            'subtotal': float(subtotal),
+            'tax': float(tax_amount),
+            'total': float(total_amount),
+            'message': 'Cart updated successfully!'
+        })
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'})

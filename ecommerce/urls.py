@@ -22,5 +22,13 @@ urlpatterns = [
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('remove-from-cart/<int:cart_item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('update-cart-item/<int:cart_item_id>/', views.update_cart_item, name='update_cart_item'),
+    path('update-cart-ajax/<int:cart_item_id>/', views.update_cart_item_ajax, name='update_cart_item_ajax'),
+
+    # Wishlist
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+
+    # Product sharing
+    path('share/<int:product_id>/', views.share_product, name='share_product'),
 ]
 
