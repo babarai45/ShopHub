@@ -11,19 +11,28 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'price', 'stock', 'is_active', 'created_at')
-    list_filter = ('category', 'is_active', 'created_at')
+    list_display = ('name', 'category', 'price', 'rating', 'total_sold', 'stock', 'is_active', 'created_at')
+    list_filter = ('category', 'is_active', 'is_featured', 'rating', 'created_at')
     search_fields = ('name', 'description')
     prepopulated_fields = {'slug': ('name',)}
     fieldsets = (
         ('Product Information', {
-            'fields': ('name', 'slug', 'description', 'category', 'price')
+            'fields': ('name', 'slug', 'description', 'short_description', 'category')
         }),
-        ('Inventory', {
-            'fields': ('stock', 'is_active')
+        ('Pricing & Discounts', {
+            'fields': ('price', 'original_price')
+        }),
+        ('Ratings & Reviews', {
+            'fields': ('rating', 'total_reviews')
+        }),
+        ('Sales & Inventory', {
+            'fields': ('stock', 'total_sold')
         }),
         ('Media', {
             'fields': ('image',)
+        }),
+        ('Status', {
+            'fields': ('is_active', 'is_featured')
         }),
     )
 

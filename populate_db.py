@@ -41,88 +41,139 @@ products_data = [
         'name': 'Wireless Headphones',
         'slug': 'wireless-headphones',
         'description': 'High-quality wireless headphones with noise cancellation and 30-hour battery life.',
+        'short_description': 'Premium wireless headphones with noise cancellation',
         'price': '99.99',
+        'original_price': '149.99',
         'category': 'electronics',
-        'stock': 50
+        'stock': 50,
+        'rating': '4.5',
+        'total_reviews': 156,
+        'total_sold': 342
     },
     {
         'name': 'Smart Watch',
         'slug': 'smart-watch',
         'description': 'Feature-rich smartwatch with fitness tracking, heart rate monitor, and GPS.',
+        'short_description': 'Advanced smartwatch with health tracking features',
         'price': '199.99',
+        'original_price': '249.99',
         'category': 'electronics',
-        'stock': 30
+        'stock': 30,
+        'rating': '4.3',
+        'total_reviews': 89,
+        'total_sold': 245
     },
     {
         'name': '4K Webcam',
         'slug': '4k-webcam',
         'description': 'Professional 4K ultra HD webcam perfect for streaming and video conferencing.',
-        'price': '149.99',
+        'short_description': '4K ultra HD streaming webcam',
+        'price': '89.99',
+        'original_price': '119.99',
         'category': 'electronics',
-        'stock': 25
+        'stock': 25,
+        'rating': '4.7',
+        'total_reviews': 256,
+        'total_sold': 578
     },
     {
         'name': 'Winter Jacket',
         'slug': 'winter-jacket',
         'description': 'Comfortable and stylish winter jacket with waterproof material and warm lining.',
+        'short_description': 'Waterproof warm winter jacket',
         'price': '89.99',
+        'original_price': '129.99',
         'category': 'fashion',
-        'stock': 40
+        'stock': 40,
+        'rating': '4.2',
+        'total_reviews': 142,
+        'total_sold': 387
     },
     {
         'name': 'Running Shoes',
         'slug': 'running-shoes',
         'description': 'Professional running shoes with advanced cushioning technology for maximum comfort.',
+        'short_description': 'Comfortable professional running shoes',
         'price': '79.99',
+        'original_price': '109.99',
         'category': 'fashion',
-        'stock': 60
+        'stock': 60,
+        'rating': '4.6',
+        'total_reviews': 298,
+        'total_sold': 651
     },
     {
         'name': 'Designer Sunglasses',
         'slug': 'designer-sunglasses',
         'description': 'Premium designer sunglasses with UV protection and stylish frames.',
+        'short_description': 'UV-protected designer sunglasses',
         'price': '129.99',
+        'original_price': '199.99',
         'category': 'fashion',
-        'stock': 35
+        'stock': 35,
+        'rating': '4.4',
+        'total_reviews': 178,
+        'total_sold': 412
     },
     {
         'name': 'Coffee Maker',
         'slug': 'coffee-maker',
         'description': 'Automatic coffee maker with programmable timer and heat retention.',
+        'short_description': 'Smart programmable coffee maker',
         'price': '59.99',
+        'original_price': '79.99',
         'category': 'home-kitchen',
-        'stock': 45
+        'stock': 45,
+        'rating': '4.1',
+        'total_reviews': 127,
+        'total_sold': 289
     },
     {
         'name': 'Air Fryer',
         'slug': 'air-fryer',
         'description': 'Healthier cooking with our advanced air fryer technology, 6L capacity.',
+        'short_description': 'Healthy air fryer cooking appliance',
         'price': '109.99',
+        'original_price': '159.99',
         'category': 'home-kitchen',
-        'stock': 20
+        'stock': 20,
+        'rating': '4.8',
+        'total_reviews': 312,
+        'total_sold': 723
     },
     {
         'name': 'Yoga Mat',
         'slug': 'yoga-mat',
         'description': 'Non-slip yoga mat with extra cushioning for comfortable practice sessions.',
+        'short_description': 'Cushioned non-slip yoga mat',
         'price': '29.99',
+        'original_price': '49.99',
         'category': 'sports',
-        'stock': 100
+        'stock': 100,
+        'rating': '4.5',
+        'total_reviews': 487,
+        'total_sold': 1245
     },
     {
         'name': 'Dumbbells Set',
         'slug': 'dumbbells-set',
         'description': 'Adjustable dumbbells set with weights from 5kg to 25kg.',
+        'short_description': 'Adjustable dumbbell weight set',
         'price': '149.99',
+        'original_price': '199.99',
         'category': 'sports',
-        'stock': 15
+        'stock': 15,
+        'rating': '4.9',
+        'total_reviews': 198,
+        'total_sold': 567
     },
 ]
 
 for prod_data in products_data:
     category = Category.objects.get(slug=prod_data.pop('category'))
+    slug = prod_data['slug']
     product, created = Product.objects.get_or_create(
-        slug=prod_data['slug'],
+        slug=slug,
         defaults={
             **prod_data,
             'category': category,
@@ -130,9 +181,15 @@ for prod_data in products_data:
         }
     )
     if created:
-        print(f"✓ Product '{product.name}' created")
+        print(f"✓ Product '{product.name}' created with {product.rating} rating")
     else:
-        print(f"✓ Product '{product.name}' already exists")
+        # Update existing product with new data
+        for key, value in prod_data.items():
+            if hasattr(product, key):
+                setattr(product, key, value)
+        product.category = category
+        product.save()
+        print(f"✓ Product '{product.name}' updated with {product.rating} rating")
 
 # Create test users
 test_users = [

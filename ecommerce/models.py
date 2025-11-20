@@ -20,11 +20,17 @@ class Product(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True)
     description = models.TextField()
+    short_description = models.CharField(max_length=500, blank=True, default='')
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text='Original price before discount')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     image = models.ImageField(upload_to='products/', default='products/default.png')
     stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    total_sold = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    rating = models.DecimalField(max_digits=3, decimal_places=1, default=0, help_text='Average rating out of 5')
+    total_reviews = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -37,6 +43,13 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_discount_percentage(self):
+        """Calculate discount percentage if original_price exists"""
+        if self.original_price:
+            discount = ((self.original_price - self.price) / self.original_price) * 100
+            return int(discount)
+        return 0
 
 
 class UserProfile(models.Model):

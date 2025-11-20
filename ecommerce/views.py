@@ -180,7 +180,7 @@ def cart_view(request):
     except Cart.DoesNotExist:
         cart = Cart.objects.create(user=request.user)
 
-    subtotal = cart.get_total()
+    subtotal = Decimal(str(cart.get_total()))
     shipping = Decimal('5.00')
     tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
     total_amount = subtotal + shipping + tax_amount
