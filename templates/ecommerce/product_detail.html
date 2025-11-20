@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - ShopHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <!-- Breadcrumb -->
+    <div class="mb-8">
+        <nav class="flex space-x-2 text-sm text-gray-600">
+            <a href="{% url 'ecommerce:home' %}" class="hover:text-blue-600">Home</a>
+            <span>/</span>
+            <a href="{% url 'ecommerce:product_list' %}" class="hover:text-blue-600">Products</a>
+            <span>/</span>
+            <span class="text-gray-900 font-semibold">{{ product.name }}</span>
+        </nav>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <!-- Product Image -->
+        <div class="flex items-center justify-center">
+            <div class="w-full bg-gray-200 rounded-lg overflow-hidden shadow-lg">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-auto object-cover">
+                {% else %}
+                    <div class="w-full h-96 flex items-center justify-center bg-gray-300">
+                        <i class="fas fa-image text-gray-400 text-6xl"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Product Details -->
+        <div>
+            <!-- Category -->
+            <div class="mb-4">
+                <a href="?category={{ product.category.id }}" class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-200">
+                    {{ product.category.name }}
+                </a>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-4xl font-bold mb-4">{{ product.name }}</h1>
+
+            <!-- Rating (Placeholder) -->
+            <div class="flex items-center space-x-2 mb-4">
+                <div class="flex text-yellow-400">
+                    {% for i in "12345" %}
+                    <i class="fas fa-star"></i>
+                    {% endfor %}
+                </div>
+                <span class="text-gray-600">(125 reviews)</span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-6">
+                <span class="text-5xl font-bold gradient-text">${{ product.price }}</span>
+                <span class="text-gray-600 line-through ml-4">${{ product.price|add:"50" }}</span>
+                <span class="bg-red-100 text-red-700 px-3 py-1 rounded ml-2">Save 20%</span>
+            </div>
+
+            <!-- Stock Status -->
+            <div class="mb-6 p-4 rounded-lg {% if product.stock > 0 %}bg-green-50{% else %}bg-red-50{% endif %}">
+                {% if product.stock > 0 %}
+                    <p class="text-green-700 font-semibold">
+                        <i class="fas fa-check-circle mr-2"></i>In Stock ({{ product.stock }} available)
+                    </p>
+                {% else %}
+                    <p class="text-red-700 font-semibold">
+                        <i class="fas fa-times-circle mr-2"></i>Out of Stock
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-8">
+                <h3 class="text-xl font-semibold mb-3">Description</h3>
+                <p class="text-gray-700 leading-relaxed">{{ product.description }}</p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            {% if product.stock > 0 and user.is_authenticated %}
+            <form method="post" action="{% url 'ecommerce:add_to_cart' product.id %}" class="space-y-4">
+                {% csrf_token %}
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center border border-gray-300 rounded-lg">
+                        <button type="button" onclick="decreaseQty()" class="px-4 py-2 text-gray-600">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}" 
+                            class="w-16 text-center border-0 focus:outline-none">
+                        <button type="button" onclick="increaseQty()" class="px-4 py-2 text-gray-600">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full gradient-bg text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg smooth-transition">
+                    <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
+                </button>
+            </form>
+            {% elif not user.is_authenticated %}
+            <a href="{% url 'ecommerce:login' %}" class="block w-full gradient-bg text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg smooth-transition text-center">
+                <i class="fas fa-shopping-cart mr-2"></i>Login to Buy
+            </a>
+            {% else %}
+            <button disabled class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg font-bold text-lg">
+                Out of Stock
+            </button>
+            {% endif %}
+
+            <!-- Additional Actions -->
+            <div class="mt-6 space-y-3 border-t pt-6">
+                <button class="w-full flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-heart"></i>
+                    <span>Add to Wishlist</span>
+                </button>
+                <button class="w-full flex items-center justify-center space-x-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
+                    <i class="fas fa-share-alt"></i>
+                    <span>Share Product</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    {% if related_products %}
+    <div class="mt-20">
+        <h2 class="text-3xl font-bold mb-8">Related Products</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for rel_product in related_products %}
+            <div class="bg-white rounded-lg shadow-md hover-lift smooth-transition overflow-hidden">
+                <div class="relative h-48 bg-gray-200 overflow-hidden">
+                    {% if rel_product.image %}
+                        <img src="{{ rel_product.image.url }}" alt="{{ rel_product.name }}" class="w-full h-full object-cover hover:scale-110 smooth-transition">
+                    {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                            <i class="fas fa-image text-gray-400 text-4xl"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="p-4">
+                    <a href="{% url 'ecommerce:product_detail' rel_product.slug %}" class="text-lg font-semibold text-gray-800 hover:gradient-text smooth-transition">
+                        {{ rel_product.name }}
+                    </a>
+                    <p class="text-2xl font-bold gradient-text mt-3">${{ rel_product.price }}</p>
+                    <form method="post" action="{% url 'ecommerce:add_to_cart' rel_product.id %}" class="mt-4">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" value="1">
+                        {% if rel_product.stock > 0 and user.is_authenticated %}
+                            <button type="submit" class="w-full gradient-bg text-white py-2 rounded-lg hover:shadow-lg smooth-transition">
+                                Add to Cart
+                            </button>
+                        {% else %}
+                            <a href="{% url 'ecommerce:login' %}" class="block w-full gradient-bg text-white py-2 rounded-lg hover:shadow-lg smooth-transition text-center">
+                                Login to Buy
+                            </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function increaseQty() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decreaseQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+</script>
+{% endblock %}
+

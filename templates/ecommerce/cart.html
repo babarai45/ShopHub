@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart - ShopHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <h1 class="text-4xl font-bold mb-8">Shopping Cart</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Cart Items -->
+        <div class="lg:col-span-2">
+            {% if cart.items.all %}
+            <div class="space-y-4">
+                {% for item in cart.items.all %}
+                <div class="bg-white rounded-lg shadow-md p-6 flex gap-4 hover-lift smooth-transition">
+                    <!-- Product Image -->
+                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                        {% if item.product.image %}
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                                <i class="fas fa-image text-gray-400"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="flex-1">
+                        <a href="{% url 'ecommerce:product_detail' item.product.slug %}" class="text-lg font-semibold text-gray-800 hover:gradient-text smooth-transition">
+                            {{ item.product.name }}
+                        </a>
+                        <p class="text-gray-600 text-sm mt-1">{{ item.product.description|truncatewords:10 }}</p>
+                        <p class="text-2xl font-bold gradient-text mt-2">${{ item.product.price }}</p>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="flex flex-col items-center justify-between">
+                        <form method="post" action="{% url 'ecommerce:update_cart_item' item.id %}" class="flex items-center border border-gray-300 rounded-lg">
+                            {% csrf_token %}
+                            <button type="button" onclick="decreaseQty(this)" class="px-3 py-1 text-gray-600">
+                                <i class="fas fa-minus text-sm"></i>
+                            </button>
+                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="w-12 text-center border-0 focus:outline-none" onchange="this.form.submit()">
+                            <button type="button" onclick="increaseQty(this)" class="px-3 py-1 text-gray-600">
+                                <i class="fas fa-plus text-sm"></i>
+                            </button>
+                        </form>
+
+                        <!-- Remove Button -->
+                        <form method="post" action="{% url 'ecommerce:remove_from_cart' item.id %}" class="mt-4">
+                            {% csrf_token %}
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-semibold">
+                                <i class="fas fa-trash mr-1"></i>Remove
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Subtotal -->
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">Subtotal</p>
+                        <p class="text-2xl font-bold gradient-text">${{ item.get_total }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Continue Shopping -->
+            <div class="mt-8">
+                <a href="{% url 'ecommerce:product_list' %}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                    <i class="fas fa-arrow-left mr-2"></i>Continue Shopping
+                </a>
+            </div>
+            {% else %}
+            <!-- Empty Cart -->
+            <div class="bg-white rounded-lg shadow-md p-12 text-center">
+                <i class="fas fa-shopping-cart text-6xl text-gray-300 mb-4"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
+                <p class="text-gray-600 mb-6">Add some products to your cart to get started</p>
+                <a href="{% url 'ecommerce:product_list' %}" class="gradient-bg text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg smooth-transition inline-block">
+                    <i class="fas fa-shopping-bag mr-2"></i>Start Shopping
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Order Summary -->
+        <div>
+            <div class="bg-white rounded-lg shadow-lg p-6 sticky top-20 h-fit">
+                <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
+
+                <div class="space-y-4 border-b pb-6 mb-6">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Subtotal</span>
+                        <span class="font-semibold">${{ cart.get_total }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Shipping</span>
+                        <span class="font-semibold">$5.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Tax</span>
+                        <span class="font-semibold">${{ tax_amount }}</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-between mb-6 text-xl font-bold">
+                    <span>Total</span>
+                    <span class="gradient-text">${{ total_amount }}</span>
+                </div>
+
+                {% if cart.items.all %}
+                <button class="w-full gradient-bg text-white py-4 rounded-lg font-bold hover:shadow-lg smooth-transition mb-4">
+                    <i class="fas fa-lock mr-2"></i>Proceed to Checkout
+                </button>
+                {% endif %}
+
+                <!-- Coupon -->
+                <div class="mt-6 pt-6 border-t">
+                    <label class="block text-sm font-semibold mb-2">Apply Coupon Code</label>
+                    <div class="flex gap-2">
+                        <input type="text" placeholder="Enter code" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="gradient-bg text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                            Apply
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="mt-6 pt-6 border-t space-y-3">
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-truck text-blue-600 mt-1"></i>
+                        <div class="text-sm">
+                            <p class="font-semibold text-gray-800">Free Shipping</p>
+                            <p class="text-gray-600">on orders over $100</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <i class="fas fa-shield-alt text-green-600 mt-1"></i>
+                        <div class="text-sm">
+                            <p class="font-semibold text-gray-800">Secure Checkout</p>
+                            <p class="text-gray-600">SSL encrypted payments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function increaseQty(button) {
+    const form = button.closest('form');
+    const input = form.querySelector('input[name="quantity"]');
+    input.value = parseInt(input.value) + 1;
+}
+
+function decreaseQty(button) {
+    const form = button.closest('form');
+    const input = form.querySelector('input[name="quantity"]');
+    if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+    }
+}
+</script>
+{% endblock %}
+
