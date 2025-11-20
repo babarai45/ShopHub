@@ -31,5 +31,10 @@ urlpatterns = [
 
     # Product sharing
     path('share/<int:product_id>/', views.share_product, name='share_product'),
+
+    # Pages
+    path('about/', views.about_view, name='about'),
+    path('blog/', views.blog_view, name='blog'),
+    path('blog/<slug:slug>/', views.blog_detail, name='blog_detail'),
 ]
 

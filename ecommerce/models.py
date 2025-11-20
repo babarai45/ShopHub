@@ -104,3 +104,48 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"Wishlist for {self.user.username}"
+
+
+class BlogCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    emoji = models.CharField(max_length=10, default='📝')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name_plural = 'Blog Categories'
+
+    def __str__(self):
+        return self.name
+
+
+class BlogPost(models.Model):
+    title = models.CharField(max_length=300)
+    slug = models.SlugField(max_length=300, unique=True)
+    category = models.ForeignKey(BlogCategory, on_delete=models.SET_NULL, null=True, related_name='posts')
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    content = models.TextField()
+    short_description = models.CharField(max_length=500)
+    image = models.ImageField(upload_to='blog/', default='blog/default.png')
+    emoji = models.CharField(max_length=10, default='📝')
+    is_published = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    views = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ('-created_at',)
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['category']),
+            models.Index(fields=['is_published']),
+        ]
+
+    def __str__(self):
+        return self.title
+
+    def get_short_content(self):
+        """Get first 150 characters of content"""
+        return self.content[:150] + '...' if len(self.content) > 150 else self.content

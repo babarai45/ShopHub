@@ -42,14 +42,20 @@
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="{% url 'ecommerce:home' %}" class="text-gray-700 hover:gradient-text smooth-transition">
-                        Home
+                        🏠 Home
                     </a>
                     <a href="{% url 'ecommerce:product_list' %}" class="text-gray-700 hover:gradient-text smooth-transition">
-                        Products
+                        🛍️ Products
+                    </a>
+                    <a href="{% url 'ecommerce:about' %}" class="text-gray-700 hover:gradient-text smooth-transition">
+                        ℹ️ About
+                    </a>
+                    <a href="{% url 'ecommerce:blog' %}" class="text-gray-700 hover:gradient-text smooth-transition">
+                        📚 Blog
                     </a>
                     <div class="relative group">
                         <button class="text-gray-700 hover:gradient-text smooth-transition flex items-center space-x-1">
-                            <span>Categories</span>
+                            <span>📁 Categories</span>
                             <i class="fas fa-chevron-down text-xs"></i>
                         </button>
                     </div>
@@ -98,6 +104,15 @@
                             <a href="{% url 'ecommerce:cart' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                 <i class="fas fa-shopping-cart mr-2"></i>Cart
                             </a>
+                            {% if user.is_staff %}
+                            <hr>
+                            <a href="/admin/ecommerce/blogpost/" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 font-semibold">
+                                <i class="fas fa-blog mr-2"></i>📝 Manage Blog
+                            </a>
+                            <a href="/admin/" class="block px-4 py-2 text-purple-600 hover:bg-purple-50 font-semibold">
+                                <i class="fas fa-cog mr-2"></i>⚙️ Admin Panel
+                            </a>
+                            {% endif %}
                             <hr>
                             <a href="{% url 'ecommerce:logout' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                                 <i class="fas fa-sign-out-alt mr-2"></i>Logout
@@ -144,10 +159,10 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Quick Links</h4>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="{% url 'ecommerce:home' %}" class="hover:text-white smooth-transition">Home</a></li>
-                        <li><a href="{% url 'ecommerce:product_list' %}" class="hover:text-white smooth-transition">Products</a></li>
-                        <li><a href="#" class="hover:text-white smooth-transition">About Us</a></li>
-                        <li><a href="#" class="hover:text-white smooth-transition">Contact</a></li>
+                        <li><a href="{% url 'ecommerce:home' %}" class="hover:text-white smooth-transition">🏠 Home</a></li>
+                        <li><a href="{% url 'ecommerce:product_list' %}" class="hover:text-white smooth-transition">🛍️ Products</a></li>
+                        <li><a href="{% url 'ecommerce:about' %}" class="hover:text-white smooth-transition">ℹ️ About Us</a></li>
+                        <li><a href="{% url 'ecommerce:blog' %}" class="hover:text-white smooth-transition">📚 Blog</a></li>
                     </ul>
                 </div>
                 <div>

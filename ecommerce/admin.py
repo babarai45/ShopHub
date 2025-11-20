@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist
+from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory
 
 
 @admin.register(Category)
@@ -65,3 +65,40 @@ class WishlistAdmin(admin.ModelAdmin):
     search_fields = ('user__username',)
     readonly_fields = ('user', 'created_at', 'updated_at')
     filter_horizontal = ('products',)
+
+
+@admin.register(BlogCategory)
+class BlogCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'emoji', 'created_at')
+    search_fields = ('name',)
+    prepopulated_fields = {'slug': ('name',)}
+
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'category', 'emoji', 'is_published', 'is_featured', 'views', 'created_at')
+    list_filter = ('is_published', 'is_featured', 'category', 'created_at')
+    search_fields = ('title', 'content', 'author__username')
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ('views', 'created_at', 'updated_at')
+
+    fieldsets = (
+        ('📝 Post Information', {
+            'fields': ('title', 'slug', 'category', 'emoji')
+        }),
+        ('✍️ Content', {
+            'fields': ('short_description', 'content', 'image')
+        }),
+        ('👤 Author & Status', {
+            'fields': ('author', 'is_published', 'is_featured')
+        }),
+        ('📊 Statistics', {
+            'fields': ('views', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def save_model(self, request, obj, form, change):
+        if not obj.author:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)

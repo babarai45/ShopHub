@@ -332,3 +332,68 @@ def wishlist_view(request):
         'page_title': 'My Wishlist'
     }
     return render(request, 'ecommerce/wishlist.html', context)
+
+
+def about_view(request):
+    """About page view"""
+    context = {
+        'page_title': 'About Us'
+    }
+    return render(request, 'ecommerce/about.html', context)
+
+
+def blog_view(request):
+    """Blog page view with published posts"""
+    from .models import BlogPost, BlogCategory
+
+    posts = BlogPost.objects.filter(is_published=True).order_by('-created_at')
+    featured_post = BlogPost.objects.filter(is_published=True, is_featured=True).first()
+    categories = BlogCategory.objects.all()
+
+    # Filter by category
+    category_id = request.GET.get('category')
+    if category_id:
+        posts = posts.filter(category_id=category_id)
+
+    # Search
+    search_query = request.GET.get('q')
+    if search_query:
+        from django.db.models import Q
+        posts = posts.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query)
+        )
+
+    context = {
+        'posts': posts,
+        'featured_post': featured_post,
+        'categories': categories,
+        'search_query': search_query,
+        'selected_category': category_id,
+        'page_title': 'Blog'
+    }
+    return render(request, 'ecommerce/blog.html', context)
+
+
+def blog_detail(request, slug):
+    """Blog post detail view"""
+    from .models import BlogPost
+
+    post = get_object_or_404(BlogPost, slug=slug, is_published=True)
+
+    # Increment views
+    post.views += 1
+    post.save(update_fields=['views'])
+
+    # Get related posts
+    related_posts = BlogPost.objects.filter(
+        is_published=True,
+        category=post.category
+    ).exclude(id=post.id)[:3]
+
+    context = {
+        'post': post,
+        'related_posts': related_posts,
+        'page_title': post.title
+    }
+    return render(request, 'ecommerce/blog_detail.html', context)
