@@ -313,3 +313,22 @@ def update_cart_item_ajax(request, cart_item_id):
         })
 
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
+@login_required(login_url='ecommerce:login')
+def wishlist_view(request):
+    """Display user's wishlist"""
+    from .models import Wishlist
+
+    try:
+        wishlist = Wishlist.objects.get(user=request.user)
+        wishlisted_products = wishlist.products.all()
+    except Wishlist.DoesNotExist:
+        wishlist = Wishlist.objects.create(user=request.user)
+        wishlisted_products = wishlist.products.all()
+
+    context = {
+        'wishlisted_products': wishlisted_products,
+        'page_title': 'My Wishlist'
+    }
+    return render(request, 'ecommerce/wishlist.html', context)
