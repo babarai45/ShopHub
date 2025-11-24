@@ -11,11 +11,16 @@ from django.http import JsonResponse
 
 def home(request):
     """Homepage with featured products"""
+    from .models import TrendingImage
+
     featured_products = Product.objects.filter(is_active=True)[:8]
     categories = Category.objects.all()
+    trending_images = TrendingImage.objects.filter(is_active=True)
+
     context = {
         'featured_products': featured_products,
         'categories': categories,
+        'trending_images': trending_images,
         'page_title': 'Home'
     }
     return render(request, 'ecommerce/home.html', context)

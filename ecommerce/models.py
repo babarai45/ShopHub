@@ -149,3 +149,21 @@ class BlogPost(models.Model):
     def get_short_content(self):
         """Get first 150 characters of content"""
         return self.content[:150] + '...' if len(self.content) > 150 else self.content
+
+
+class TrendingImage(models.Model):
+    title = models.CharField(max_length=200)
+    subtitle = models.CharField(max_length=500, blank=True)
+    image = models.ImageField(upload_to='trending/')
+    link = models.URLField(blank=True, help_text='Link when image is clicked')
+    order = models.IntegerField(default=0, help_text='Order in slider (0 = first)')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('order',)
+        verbose_name_plural = 'Trending Images'
+
+    def __str__(self):
+        return self.title

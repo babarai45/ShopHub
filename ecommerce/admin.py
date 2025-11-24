@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory
+from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory, TrendingImage
 
 
 @admin.register(Category)
@@ -102,3 +102,24 @@ class BlogPostAdmin(admin.ModelAdmin):
         if not obj.author:
             obj.author = request.user
         super().save_model(request, obj, form, change)
+
+
+@admin.register(TrendingImage)
+class TrendingImageAdmin(admin.ModelAdmin):
+    list_display = ('title', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'subtitle')
+    fieldsets = (
+        ('🖼️ Image Information', {
+            'fields': ('title', 'subtitle', 'image')
+        }),
+        ('🔗 Settings', {
+            'fields': ('link', 'order', 'is_active')
+        }),
+        ('📊 Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    readonly_fields = ('created_at', 'updated_at')
