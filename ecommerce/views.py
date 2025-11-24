@@ -136,6 +136,8 @@ def logout_view(request):
 @login_required(login_url='ecommerce:login')
 def profile(request):
     """User profile"""
+    from .models import Order, Wishlist
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
 
     if request.method == 'POST':
@@ -147,10 +149,27 @@ def profile(request):
     else:
         form = UserProfileForm(instance=user_profile)
 
+    # Calculate statistics
+    total_orders = Order.objects.filter(user=request.user).count()
+    completed_orders = Order.objects.filter(user=request.user, status='completed').count()
+    pending_orders = Order.objects.filter(user=request.user, status='pending').count()
+
+    # Get wishlist count
+    wishlist_count = 0
+    try:
+        wishlist = Wishlist.objects.get(user=request.user)
+        wishlist_count = wishlist.products.count()
+    except Wishlist.DoesNotExist:
+        wishlist_count = 0
+
     context = {
         'form': form,
         'user_profile': user_profile,
-        'page_title': 'My Profile'
+        'page_title': 'My Profile',
+        'total_orders': total_orders,
+        'completed_orders': completed_orders,
+        'pending_orders': pending_orders,
+        'wishlist_count': wishlist_count,
     }
     return render(request, 'ecommerce/profile.html', context)
 
@@ -402,3 +421,54 @@ def blog_detail(request, slug):
         'page_title': post.title
     }
     return render(request, 'ecommerce/blog_detail.html', context)
+
+
+@login_required(login_url='ecommerce:login')
+def my_orders(request):
+    """Display user's orders"""
+    from .models import Order
+
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+
+    context = {
+        'orders': orders,
+        'page_title': 'My Orders'
+    }
+    return render(request, 'ecommerce/my_orders.html', context)
+
+
+@login_required(login_url='ecommerce:login')
+def order_detail(request, order_id):
+    """Display order details"""
+    from .models import Order
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    context = {
+        'order': order,
+        'page_title': f'Order #{order.id}'
+    }
+    return render(request, 'ecommerce/order_detail.html', context)
+
+
+@login_required(login_url='ecommerce:login')
+def settings_view(request):
+    """User settings page"""
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Settings updated successfully!')
+            return redirect('ecommerce:settings')
+    else:
+        form = UserProfileForm(instance=user_profile)
+
+    context = {
+        'form': form,
+        'user_profile': user_profile,
+        'page_title': 'Settings'
+    }
+    return render(request, 'ecommerce/settings.html', context)
+

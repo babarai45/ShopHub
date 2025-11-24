@@ -31,13 +31,13 @@
                     <a href="{% url 'ecommerce:cart' %}" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-shopping-cart mr-2"></i>My Cart
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <a href="{% url 'ecommerce:my_orders' %}" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-box mr-2"></i>My Orders
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <a href="{% url 'ecommerce:wishlist_view' %}" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-heart mr-2"></i>Wishlist
                     </a>
-                    <a href="#" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
+                    <a href="{% url 'ecommerce:settings' %}" class="block px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">
                         <i class="fas fa-cog mr-2"></i>Settings
                     </a>
                     <a href="{% url 'ecommerce:logout' %}" class="block px-4 py-2 rounded-lg text-red-600 hover:bg-red-50">
@@ -166,26 +166,26 @@
 
             <!-- Account Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center">
+                <a href="{% url 'ecommerce:my_orders' %}" class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 text-center hover:shadow-lg transition cursor-pointer">
                     <i class="fas fa-box text-blue-600 text-2xl mb-2"></i>
                     <p class="text-sm text-gray-600">Total Orders</p>
-                    <p class="text-2xl font-bold text-blue-600">5</p>
-                </div>
+                    <p class="text-2xl font-bold text-blue-600">{{ total_orders }}</p>
+                </a>
                 <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 text-center">
                     <i class="fas fa-check-circle text-green-600 text-2xl mb-2"></i>
                     <p class="text-sm text-gray-600">Completed</p>
-                    <p class="text-2xl font-bold text-green-600">4</p>
+                    <p class="text-2xl font-bold text-green-600">{{ completed_orders }}</p>
                 </div>
                 <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-4 text-center">
                     <i class="fas fa-clock text-yellow-600 text-2xl mb-2"></i>
                     <p class="text-sm text-gray-600">Pending</p>
-                    <p class="text-2xl font-bold text-yellow-600">1</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ pending_orders }}</p>
                 </div>
-                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center">
+                <a href="{% url 'ecommerce:wishlist_view' %}" class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 text-center hover:shadow-lg transition cursor-pointer">
                     <i class="fas fa-heart text-purple-600 text-2xl mb-2"></i>
                     <p class="text-sm text-gray-600">Wishlist</p>
-                    <p class="text-2xl font-bold text-purple-600">12</p>
-                </div>
+                    <p class="text-2xl font-bold text-purple-600">{{ wishlist_count }}</p>
+                </a>
             </div>
         </div>
     </div>
