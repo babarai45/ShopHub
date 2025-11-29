@@ -182,6 +182,15 @@ def add_to_cart(request, product_id):
 
     quantity = int(request.POST.get('quantity', 1))
 
+    # Validate stock
+    if quantity > product.stock:
+        messages.error(request, f'Only {product.stock} items available in stock!')
+        return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
+    if quantity <= 0:
+        messages.error(request, 'Quantity must be greater than 0!')
+        return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
@@ -189,7 +198,12 @@ def add_to_cart(request, product_id):
     )
 
     if not created:
-        cart_item.quantity += quantity
+        # Check if total quantity exceeds stock
+        new_quantity = cart_item.quantity + quantity
+        if new_quantity > product.stock:
+            messages.error(request, f'Only {product.stock - cart_item.quantity} more items can be added!')
+            return redirect('ecommerce:cart')
+        cart_item.quantity = new_quantity
         cart_item.save()
 
     messages.success(request, f'{product.name} added to cart!')
@@ -238,10 +252,18 @@ def update_cart_item(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
     quantity = int(request.POST.get('quantity', 1))
 
-    if quantity > 0:
-        cart_item.quantity = quantity
-        cart_item.save()
-        messages.success(request, 'Cart updated!')
+    # Validate stock
+    if quantity > cart_item.product.stock:
+        messages.error(request, f'Only {cart_item.product.stock} items available in stock!')
+        return redirect('ecommerce:cart')
+
+    if quantity <= 0:
+        messages.error(request, 'Quantity must be greater than 0!')
+        return redirect('ecommerce:cart')
+
+    cart_item.quantity = quantity
+    cart_item.save()
+    messages.success(request, 'Cart updated!')
 
     return redirect('ecommerce:cart')
 
