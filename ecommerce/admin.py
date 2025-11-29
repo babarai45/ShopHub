@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory, TrendingImage, Order, OrderItem
+from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory, TrendingImage, Order, OrderItem, Coupon
 
 
 @admin.register(Category)
@@ -162,3 +162,30 @@ class OrderItemAdmin(admin.ModelAdmin):
     search_fields = ('order__id', 'product__name')
     readonly_fields = ('order', 'product', 'quantity', 'price')
 
+
+@admin.register(Coupon)
+class CouponAdmin(admin.ModelAdmin):
+    list_display = ('code', 'discount_type', 'discount_value', 'is_active', 'current_uses', 'max_uses', 'valid_from', 'valid_until', 'created_at')
+    list_filter = ('discount_type', 'is_active', 'valid_from', 'valid_until', 'created_at')
+    search_fields = ('code', 'description')
+    readonly_fields = ('current_uses', 'created_at', 'updated_at')
+    list_editable = ('is_active',)
+
+    fieldsets = (
+        ('🎟️ Coupon Code', {
+            'fields': ('code', 'description')
+        }),
+        ('💰 Discount Settings', {
+            'fields': ('discount_type', 'discount_value', 'min_order_amount')
+        }),
+        ('🔐 Usage Limits', {
+            'fields': ('max_uses', 'current_uses')
+        }),
+        ('📅 Validity', {
+            'fields': ('valid_from', 'valid_until', 'is_active')
+        }),
+        ('📊 Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )

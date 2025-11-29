@@ -26,6 +26,9 @@ urlpatterns = [
     path('remove-from-cart/<int:cart_item_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('update-cart-item/<int:cart_item_id>/', views.update_cart_item, name='update_cart_item'),
     path('update-cart-ajax/<int:cart_item_id>/', views.update_cart_item_ajax, name='update_cart_item_ajax'),
+    path('checkout/', views.checkout, name='checkout'),
+    path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
+    path('remove-coupon/', views.remove_coupon, name='remove_coupon'),
 
     # Wishlist
     path('wishlist/', views.wishlist_view, name='wishlist_view'),

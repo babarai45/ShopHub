@@ -109,17 +109,17 @@
                 </div>
 
                 {% if cart.items.all %}
-                <button class="w-full gradient-bg text-white py-4 rounded-lg font-bold hover:shadow-lg smooth-transition mb-4">
+                <a href="{% url 'ecommerce:checkout' %}" class="block w-full gradient-bg text-white py-4 rounded-lg font-bold hover:shadow-lg smooth-transition mb-4 text-center">
                     <i class="fas fa-lock mr-2"></i>Proceed to Checkout
-                </button>
+                </a>
                 {% endif %}
 
                 <!-- Coupon -->
                 <div class="mt-6 pt-6 border-t">
-                    <label class="block text-sm font-semibold mb-2">Apply Coupon Code</label>
+                    <label class="block text-sm font-semibold mb-2">🎟️ Apply Coupon Code</label>
                     <div class="flex gap-2">
-                        <input type="text" placeholder="Enter code" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <button class="gradient-bg text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                        <input type="text" id="coupon_code" placeholder="Enter code" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" maxlength="50">
+                        <button type="button" onclick="applyCouponCart()" class="gradient-bg text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition font-semibold">
                             Apply
                         </button>
                     </div>
@@ -239,6 +239,40 @@ function showNotification(message, type) {
     
     setTimeout(() => alertDiv.remove(), 3000);
 }
+
+function applyCouponCart() {
+    const couponCode = document.getElementById('coupon_code').value.trim();
+
+    if (!couponCode) {
+        showNotification('Please enter a coupon code', 'error');
+        return;
+    }
+
+    // Get CSRF token from page
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{% csrf_token %}';
+
+    fetch("{% url 'ecommerce:apply_coupon' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrftoken,
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: 'coupon_code=' + encodeURIComponent(couponCode)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification(data.message, 'success');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error applying coupon', 'error');
+    });
+}
 </script>
 {% endblock %}
-

@@ -472,3 +472,214 @@ def settings_view(request):
     }
     return render(request, 'ecommerce/settings.html', context)
 
+
+@login_required(login_url='ecommerce:login')
+def checkout(request):
+    """Checkout page with payment processing"""
+    from decimal import Decimal
+    from .models import Order, OrderItem, Cart, Coupon
+
+    try:
+        cart = Cart.objects.get(user=request.user)
+    except Cart.DoesNotExist:
+        messages.error(request, 'Your cart is empty!')
+        return redirect('ecommerce:cart')
+
+    if not cart.items.exists():
+        messages.error(request, 'Your cart is empty!')
+        return redirect('ecommerce:cart')
+
+    user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    # Get applied coupon from session
+    applied_coupon = None
+    coupon_discount = Decimal('0.00')
+
+    if 'applied_coupon' in request.session:
+        try:
+            applied_coupon = Coupon.objects.get(code__iexact=request.session['applied_coupon'])
+            if applied_coupon.is_valid():
+                subtotal = Decimal(str(cart.get_total()))
+                coupon_discount = Decimal(str(applied_coupon.get_discount_amount(subtotal)))
+        except Coupon.DoesNotExist:
+            del request.session['applied_coupon']
+
+    if request.method == 'POST':
+        # Get form data
+        payment_method = request.POST.get('payment_method', 'card')
+        shipping_address = request.POST.get('shipping_address', '')
+
+        # Calculate totals
+        subtotal = Decimal(str(cart.get_total()))
+        shipping = Decimal('5.00')
+        subtotal_with_coupon = subtotal - coupon_discount
+        tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+        total_amount = subtotal_with_coupon + shipping + tax_amount
+
+        # Create order
+        order = Order.objects.create(
+            user=request.user,
+            total_amount=total_amount,
+            status='pending'
+        )
+
+        # Create order items
+        for cart_item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=cart_item.product,
+                quantity=cart_item.quantity,
+                price=cart_item.product.price
+            )
+            # Update product sold count
+            cart_item.product.total_sold += cart_item.quantity
+            cart_item.product.save(update_fields=['total_sold'])
+
+        # Apply coupon if exists
+        if applied_coupon:
+            applied_coupon.apply()
+            del request.session['applied_coupon']
+
+        # Process payment (dummy integration)
+        if payment_method == 'card':
+            # Simulate payment processing
+            # In production, integrate with Stripe, PayPal, etc.
+            order.status = 'completed'
+            order.save(update_fields=['status'])
+
+            # Clear cart
+            cart.items.all().delete()
+
+            messages.success(request, f'Order #{order.id} placed successfully! Payment processed.')
+            return redirect('ecommerce:order_detail', order_id=order.id)
+        else:
+            # Other payment methods (COD, etc.)
+            messages.success(request, f'Order #{order.id} placed! Awaiting payment verification.')
+            return redirect('ecommerce:order_detail', order_id=order.id)
+
+    # Calculate totals
+    subtotal = Decimal(str(cart.get_total()))
+    shipping = Decimal('5.00')
+    subtotal_with_coupon = subtotal - coupon_discount
+    tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+    total_amount = subtotal_with_coupon + shipping + tax_amount
+
+    context = {
+        'cart': cart,
+        'user_profile': user_profile,
+        'subtotal': subtotal,
+        'coupon_discount': coupon_discount,
+        'shipping': shipping,
+        'tax_amount': tax_amount,
+        'total_amount': total_amount,
+        'applied_coupon': applied_coupon,
+        'page_title': 'Checkout'
+    }
+    return render(request, 'ecommerce/checkout.html', context)
+
+
+@login_required(login_url='ecommerce:login')
+def apply_coupon(request):
+    """Apply coupon code to cart via AJAX"""
+    from decimal import Decimal
+    from .models import Cart, Coupon
+
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        coupon_code = request.POST.get('coupon_code', '').strip().upper()
+
+        try:
+            cart = Cart.objects.get(user=request.user)
+        except Cart.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Cart is empty!'
+            })
+
+        try:
+            # Use case-insensitive lookup
+            coupon = Coupon.objects.get(code__iexact=coupon_code)
+        except Coupon.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': f'Coupon code "{coupon_code}" not found!'
+            })
+
+        # Check if coupon is valid
+        if not coupon.is_valid():
+            if coupon.current_uses >= coupon.max_uses:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'This coupon has reached its usage limit!'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': 'This coupon is no longer valid!'
+                })
+
+        # Check minimum order amount
+        subtotal = Decimal(str(cart.get_total()))
+        if subtotal < coupon.min_order_amount:
+            return JsonResponse({
+                'success': False,
+                'message': f'Minimum order amount ${coupon.min_order_amount} required for this coupon!'
+            })
+
+        # Apply coupon - store the actual code from database
+        request.session['applied_coupon'] = coupon.code
+        coupon_discount = Decimal(str(coupon.get_discount_amount(subtotal)))
+
+        # Recalculate totals
+        subtotal_with_coupon = subtotal - coupon_discount
+        shipping = Decimal('5.00')
+        tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+        total_amount = subtotal_with_coupon + shipping + tax_amount
+
+        return JsonResponse({
+            'success': True,
+            'message': f'Coupon "{coupon_code}" applied successfully!',
+            'coupon_code': coupon_code,
+            'coupon_discount': float(coupon_discount),
+            'subtotal': float(subtotal),
+            'subtotal_with_coupon': float(subtotal_with_coupon),
+            'tax': float(tax_amount),
+            'total': float(total_amount)
+        })
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
+@login_required(login_url='ecommerce:login')
+def remove_coupon(request):
+    """Remove applied coupon code"""
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        from decimal import Decimal
+        from .models import Cart
+
+        try:
+            cart = Cart.objects.get(user=request.user)
+        except Cart.DoesNotExist:
+            return JsonResponse({
+                'success': False,
+                'message': 'Cart is empty!'
+            })
+
+        if 'applied_coupon' in request.session:
+            del request.session['applied_coupon']
+
+        # Recalculate totals without coupon
+        subtotal = Decimal(str(cart.get_total()))
+        shipping = Decimal('5.00')
+        tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+        total_amount = subtotal + shipping + tax_amount
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Coupon removed successfully!',
+            'subtotal': float(subtotal),
+            'tax': float(tax_amount),
+            'total': float(total_amount),
+            'coupon_discount': 0.0
+        })
+
+    return JsonResponse({'success': False, 'message': 'Invalid request'})

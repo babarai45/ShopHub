@@ -197,3 +197,53 @@ class TrendingImage(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Coupon(models.Model):
+    DISCOUNT_TYPE_CHOICES = [
+        ('fixed', 'Fixed Amount'),
+        ('percentage', 'Percentage'),
+    ]
+
+    code = models.CharField(max_length=50, unique=True, db_index=True)
+    discount_type = models.CharField(max_length=10, choices=DISCOUNT_TYPE_CHOICES, default='percentage')
+    discount_value = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    min_order_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0, validators=[MinValueValidator(0)])
+    max_uses = models.IntegerField(default=100, help_text='Maximum uses of this coupon')
+    current_uses = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name_plural = 'Coupons'
+
+    def __str__(self):
+        return f"{self.code} - {self.discount_value} ({self.get_discount_type_display()})"
+
+    def is_valid(self):
+        """Check if coupon is currently valid"""
+        from django.utils import timezone
+        now = timezone.now()
+        return (
+            self.is_active and
+            self.current_uses < self.max_uses and
+            self.valid_from <= now <= self.valid_until
+        )
+
+    def get_discount_amount(self, order_total):
+        """Calculate discount amount for given order total"""
+        if self.discount_type == 'fixed':
+            return min(self.discount_value, order_total)
+        else:  # percentage
+            discount = (order_total * self.discount_value) / 100
+            return discount
+
+    def apply(self):
+        """Mark coupon as used"""
+        self.current_uses += 1
+        self.save()
