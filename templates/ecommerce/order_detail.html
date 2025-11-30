@@ -77,11 +77,7 @@
                 <div class="mb-6 pb-6 border-b border-gray-200">
                     <div class="flex justify-between mb-2">
                         <p class="text-sm text-gray-600">Subtotal</p>
-<<<<<<< HEAD
-a                        <p class="font-semibold text-gray-900">₨{{ order.subtotal|floatformat:"2" }}</p>
-=======
                         <p class="font-semibold text-gray-900">₨{{ order.subtotal|floatformat:"2" }}</p>
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
                     </div>
                     <div class="flex justify-between mb-2">
                         <p class="text-sm text-gray-600">Shipping</p>
@@ -105,8 +101,6 @@ a                        <p class="font-semibold text-gray-900">₨{{ order.subt
                 <a href="{% url 'ecommerce:download_invoice' order.id %}" class="w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold hover:bg-blue-700 transition text-center block">
                     <i class="fas fa-download mr-2"></i>Download Invoice
                 </a>
-                    <i class="fas fa-download mr-2"></i>Download Invoice
-                </button>
             </div>
         </div>
     </div>
