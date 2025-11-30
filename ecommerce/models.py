@@ -160,7 +160,17 @@ class Order(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    # Shipping and Tax
+    shipping_method = models.ForeignKey('ShippingMethod', on_delete=models.SET_NULL, null=True, blank=True)
+    tax_rate = models.ForeignKey('TaxRate', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Amount breakdown
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -169,6 +179,23 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Order #{self.id} by {self.user.username}"
+
+    def calculate_totals(self):
+        """Calculate subtotal, tax, and total"""
+        self.subtotal = sum(item.price * item.quantity for item in self.items.all())
+
+        if self.tax_rate:
+            self.tax_amount = self.tax_rate.calculate_tax(self.subtotal)
+        else:
+            self.tax_amount = 0
+
+        if self.shipping_method:
+            self.shipping_cost = self.shipping_method.price
+        else:
+            self.shipping_cost = 0
+
+        self.total_amount = self.subtotal + self.tax_amount + self.shipping_cost
+        self.save()
 
 
 class OrderItem(models.Model):
@@ -275,7 +302,7 @@ class TaxRate(models.Model):
     rate_percentage = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        validators=[MinValueValidator(0), MinValueValidator(0)],
+        validators=[MinValueValidator(0)],
         help_text='Tax rate as percentage (e.g., 17 for 17%)'
     )
     is_active = models.BooleanField(default=True)

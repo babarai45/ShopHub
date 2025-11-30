@@ -53,6 +53,7 @@ urlpatterns = [
     path('settings/', views.settings_view, name='settings'),
     path('my-orders/', views.my_orders, name='my_orders'),
     path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
+    path('orders/<int:order_id>/invoice/', views.download_invoice, name='download_invoice'),
 
     # Shopping cart
     path('cart/', views.cart_view, name='cart'),

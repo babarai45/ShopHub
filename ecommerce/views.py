@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
-from .models import Product, Category, Cart, CartItem, UserProfile
+from .models import Product, Category, Cart, CartItem, UserProfile, Order, ShippingMethod, TaxRate
 from .forms import CustomUserCreationForm, CustomAuthenticationForm, UserProfileForm
 import json
 from django.http import JsonResponse
@@ -220,16 +220,27 @@ def cart_view(request):
     except Cart.DoesNotExist:
         cart = Cart.objects.create(user=request.user)
 
+    # Get admin-configured shipping and tax
+    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
     subtotal = Decimal(str(cart.get_total()))
-    shipping = Decimal('5.00')
-    tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+    shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
+
+    if tax_rate:
+        tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal + shipping)))
+    else:
+        tax_amount = Decimal('0.00')
+
     total_amount = subtotal + shipping + tax_amount
 
     context = {
         'cart': cart,
         'subtotal': subtotal,
         'shipping': shipping,
+        'shipping_method': shipping_method,
         'tax_amount': tax_amount,
+        'tax_rate': tax_rate,
         'total_amount': total_amount,
         'page_title': 'Shopping Cart'
     }
@@ -531,16 +542,31 @@ def checkout(request):
         payment_method = request.POST.get('payment_method', 'card')
         shipping_address = request.POST.get('shipping_address', '')
 
+        # Get shipping method and tax rate from admin configuration
+        shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
         # Calculate totals
         subtotal = Decimal(str(cart.get_total()))
-        shipping = Decimal('5.00')
-        subtotal_with_coupon = subtotal - coupon_discount
-        tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
-        total_amount = subtotal_with_coupon + shipping + tax_amount
+        shipping_cost = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
 
-        # Create order
+        subtotal_with_coupon = subtotal - coupon_discount
+
+        if tax_rate:
+            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping_cost)))
+        else:
+            tax_amount = Decimal('0.00')
+
+        total_amount = subtotal_with_coupon + shipping_cost + tax_amount
+
+        # Create order with references to shipping and tax
         order = Order.objects.create(
             user=request.user,
+            shipping_method=shipping_method,
+            tax_rate=tax_rate,
+            subtotal=subtotal,
+            shipping_cost=shipping_cost,
+            tax_amount=tax_amount,
             total_amount=total_amount,
             status='pending'
         )
@@ -579,11 +605,20 @@ def checkout(request):
             messages.success(request, f'Order #{order.id} placed! Awaiting payment verification.')
             return redirect('ecommerce:order_detail', order_id=order.id)
 
+    # Get shipping method and tax rate from admin configuration
+    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
     # Calculate totals
     subtotal = Decimal(str(cart.get_total()))
-    shipping = Decimal('5.00')
+    shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
     subtotal_with_coupon = subtotal - coupon_discount
-    tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+
+    if tax_rate:
+        tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping)))
+    else:
+        tax_amount = Decimal('0.00')
+
     total_amount = subtotal_with_coupon + shipping + tax_amount
 
     context = {
@@ -592,7 +627,9 @@ def checkout(request):
         'subtotal': subtotal,
         'coupon_discount': coupon_discount,
         'shipping': shipping,
+        'shipping_method': shipping_method,
         'tax_amount': tax_amount,
+        'tax_rate': tax_rate,
         'total_amount': total_amount,
         'applied_coupon': applied_coupon,
         'page_title': 'Checkout'
@@ -705,3 +742,162 @@ def remove_coupon(request):
         })
 
     return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
+@login_required(login_url='ecommerce:login')
+def download_invoice(request, order_id):
+    """Download order invoice as PDF with professional formatting"""
+    from django.http import HttpResponse
+    from reportlab.lib.pagesizes import letter
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from io import BytesIO
+
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+
+    # Create PDF in memory
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=0.5*inch, leftMargin=0.5*inch,
+                          topMargin=0.5*inch, bottomMargin=0.5*inch)
+
+    elements = []
+    styles = getSampleStyleSheet()
+
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        textColor=colors.HexColor('#667eea'),
+        spaceAfter=6,
+        alignment=1
+    )
+
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#667eea'),
+        spaceAfter=12,
+        spaceBefore=12
+    )
+
+    # Title
+    elements.append(Paragraph("🛍️ ShopHub Invoice", title_style))
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Invoice header info
+    header_data = [
+        ['Invoice #', f'{order.id}', 'Date', order.created_at.strftime('%B %d, %Y')],
+        ['Status', order.get_status_display(), 'Order Time', order.created_at.strftime('%I:%M %p')],
+    ]
+
+    header_table = Table(header_data, colWidths=[1.5*inch, 1.5*inch, 1.5*inch, 1.5*inch])
+    header_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f0f0f0')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Customer info
+    elements.append(Paragraph("Customer Information", heading_style))
+    customer_data = [
+        ['Name', order.user.get_full_name() or order.user.username],
+        ['Email', order.user.email],
+    ]
+
+    customer_table = Table(customer_data, colWidths=[1.5*inch, 5*inch])
+    customer_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#667eea')),
+        ('TEXTCOLOR', (0, 0), (0, -1), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    elements.append(customer_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Order items
+    elements.append(Paragraph("Order Items", heading_style))
+
+    items_data = [['Product', 'Quantity', 'Unit Price', 'Total']]
+
+    for item in order.items.all():
+        items_data.append([
+            item.product.name[:40],
+            str(item.quantity),
+            f'₨{item.price:.2f}',
+            f'₨{item.price * item.quantity:.2f}'
+        ])
+
+    items_table = Table(items_data, colWidths=[2.5*inch, 1*inch, 1.5*inch, 1.5*inch])
+    items_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#667eea')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9f9f9')])
+    ]))
+    elements.append(items_table)
+    elements.append(Spacer(1, 0.2*inch))
+
+    # Order summary
+    elements.append(Paragraph("Order Summary", heading_style))
+
+    summary_data = [
+        ['Subtotal', '', f'₨{order.subtotal:.2f}'],
+        ['Shipping', f'({order.shipping_method.name if order.shipping_method else "N/A"})', f'₨{order.shipping_cost:.2f}'],
+        ['Tax', f'({order.tax_rate.name if order.tax_rate else "N/A"})', f'₨{order.tax_amount:.2f}'],
+        ['', '', ''],
+        ['TOTAL', '', f'₨{order.total_amount:.2f}'],
+    ]
+
+    summary_table = Table(summary_data, colWidths=[3*inch, 1.5*inch, 1.5*inch])
+    summary_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'RIGHT'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 3), 'Helvetica'),
+        ('FONTNAME', (0, 4), (-1, 4), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 4), (-1, 4), 12),
+        ('BACKGROUND', (0, 4), (-1, 4), colors.HexColor('#667eea')),
+        ('TEXTCOLOR', (0, 4), (-1, 4), colors.white),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey)
+    ]))
+    elements.append(summary_table)
+    elements.append(Spacer(1, 0.3*inch))
+
+    # Footer
+    footer_style = ParagraphStyle(
+        'Footer',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.grey,
+        alignment=1
+    )
+    elements.append(Paragraph("Thank you for your purchase!", footer_style))
+    elements.append(Paragraph("For any queries, contact: support@shophub.com", footer_style))
+    elements.append(Paragraph("Visit us: www.shophub.com", footer_style))
+
+    # Build PDF
+    doc.build(elements)
+
+    # Return PDF
+    buffer.seek(0)
+    response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice-{order.id}.pdf"'
+    return response
