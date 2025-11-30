@@ -6,7 +6,7 @@ import django
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SepApp.settings')
-sys.path.insert(0, 'E:\\Specialization\\django_Sep\\SepApp')
+sys.path.insert(0, '/')
 django.setup()
 
 from ecommerce.models import Coupon
