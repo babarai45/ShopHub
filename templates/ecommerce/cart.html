@@ -30,7 +30,7 @@
                             {{ item.product.name }}
                         </a>
                         <p class="text-gray-600 text-sm mt-1">{{ item.product.description|truncatewords:10 }}</p>
-                        <p class="text-2xl font-bold gradient-text mt-2">${{ item.product.price }}</p>
+                        <p class="text-2xl font-bold gradient-text mt-2">₨{{ item.product.price }}</p>
                     </div>
 
                     <!-- Quantity -->
@@ -58,7 +58,7 @@
                     <!-- Subtotal -->
                     <div class="text-right">
                         <p class="text-sm text-gray-600">Subtotal</p>
-                        <p class="text-2xl font-bold gradient-text">${{ item.get_total }}</p>
+                        <p class="text-2xl font-bold gradient-text">₨{{ item.get_total }}</p>
                     </div>
                 </div>
                 {% endfor %}
@@ -91,21 +91,21 @@
                 <div class="space-y-4 border-b pb-6 mb-6">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Subtotal</span>
-                        <span class="font-semibold" data-subtotal>${{ subtotal }}</span>
+                        <span class="font-semibold" data-subtotal>₨{{ subtotal }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-semibold">$5.00</span>
+                        <span class="font-semibold">₨5.00</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-semibold" data-tax>${{ tax_amount }}</span>
+                        <span class="font-semibold" data-tax>₨{{ tax_amount }}</span>
                     </div>
                 </div>
 
                 <div class="flex justify-between mb-6 text-xl font-bold">
                     <span>Total</span>
-                    <span class="gradient-text" data-total>${{ total_amount }}</span>
+                    <span class="gradient-text" data-total>₨{{ total_amount }}</span>
                 </div>
 
                 {% if cart.items.all %}
@@ -202,18 +202,18 @@ function updateCartAjax(input) {
     .then(data => {
         if (data.success) {
             // Update subtotal
-            document.querySelector('[data-subtotal]').textContent = '$' + data.subtotal.toFixed(2);
-            
+            document.querySelector('[data-subtotal]').textContent = '₨' + data.subtotal.toFixed(2);
+
             // Update tax
-            document.querySelector('[data-tax]').textContent = '$' + data.tax.toFixed(2);
-            
+            document.querySelector('[data-tax]').textContent = '₨' + data.tax.toFixed(2);
+
             // Update total
-            document.querySelector('[data-total]').textContent = '$' + data.total.toFixed(2);
-            
+            document.querySelector('[data-total]').textContent = '₨' + data.total.toFixed(2);
+
             // Update item subtotal
             const itemTotal = input.closest('.flex').nextElementSibling;
             if (itemTotal) {
-                input.closest('.flex-col').parentElement.querySelector('p:last-child').textContent = '$' + data.item_total.toFixed(2);
+                input.closest('.flex-col').parentElement.querySelector('p:last-child').textContent = '₨' + data.item_total.toFixed(2);
             }
             
             // Show success message
