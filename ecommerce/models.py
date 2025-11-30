@@ -278,20 +278,12 @@ class Coupon(models.Model):
 
 
 class ShippingMethod(models.Model):
-<<<<<<< HEAD
     """Shipping methods managed by admin"""
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
-    estimated_days = models.IntegerField(default=3)
-=======
-    """Shipping methods that can be managed by admin"""
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     # Price in PKR (Pakistani Rupees)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     estimated_days = models.IntegerField(default=3, help_text='Estimated delivery days')
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -301,23 +293,11 @@ class ShippingMethod(models.Model):
         verbose_name_plural = 'Shipping Methods'
 
     def __str__(self):
-<<<<<<< HEAD
         return f"{self.name} - ₨{self.price:.2f}"
 
 
 class TaxRate(models.Model):
     """Tax rates managed by admin"""
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
-    rate_percentage = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
-    is_active = models.BooleanField(default=True)
-    is_default = models.BooleanField(default=False)
-=======
-        return f"{self.name} - PKR {self.price:.2f}"
-
-
-class TaxRate(models.Model):
-    """Tax rates that can be managed by admin"""
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     rate_percentage = models.DecimalField(
@@ -328,7 +308,6 @@ class TaxRate(models.Model):
     )
     is_active = models.BooleanField(default=True)
     is_default = models.BooleanField(default=False, help_text='Set as default tax rate')
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -340,9 +319,5 @@ class TaxRate(models.Model):
         return f"{self.name} - {self.rate_percentage}%"
 
     def calculate_tax(self, amount):
-<<<<<<< HEAD
-        """Calculate tax amount"""
-=======
         """Calculate tax amount for given amount"""
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
         return (amount * self.rate_percentage) / 100

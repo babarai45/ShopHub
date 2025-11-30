@@ -161,16 +161,8 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 # Email configuration for password reset
-<<<<<<< HEAD
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Console backend for development
 # For production, use:
-=======
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'  # File backend for development
-EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'  # Directory where emails will be saved
-# Alternative - Console backend prints to terminal:
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# For production with Gmail:
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_HOST = 'smtp.gmail.com'
 # EMAIL_PORT = 587
@@ -181,12 +173,7 @@ EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'  # Directory where emails will be sav
 # Password reset link timeout (in seconds) - 1 hour
 PASSWORD_RESET_TIMEOUT = 3600
 
-<<<<<<< HEAD
 # Allauth settings - Updated to latest format
-=======
-# Allauth settings
-ACCOUNT_LOGIN_METHODS = {'email', 'username'}
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 SOCIALACCOUNT_AUTO_SIGNUP = True

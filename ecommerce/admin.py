@@ -197,12 +197,6 @@ class CouponAdmin(admin.ModelAdmin):
 
 @admin.register(ShippingMethod)
 class ShippingMethodAdmin(admin.ModelAdmin):
-<<<<<<< HEAD
-    list_display = ('name', 'price', 'estimated_days', 'is_active')
-    list_editable = ('is_active',)
-    search_fields = ('name',)
-    list_filter = ('is_active',)
-=======
     list_display = ('name', 'price', 'estimated_days', 'is_active', 'created_at')
     list_filter = ('is_active', 'created_at')
     search_fields = ('name', 'description')
@@ -227,17 +221,10 @@ class ShippingMethodAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
 
 
 @admin.register(TaxRate)
 class TaxRateAdmin(admin.ModelAdmin):
-<<<<<<< HEAD
-    list_display = ('name', 'rate_percentage', 'is_active', 'is_default')
-    list_editable = ('is_active', 'is_default')
-    search_fields = ('name',)
-    list_filter = ('is_active', 'is_default')
-=======
     list_display = ('name', 'rate_percentage', 'is_active', 'is_default', 'created_at')
     list_filter = ('is_active', 'is_default', 'created_at')
     search_fields = ('name', 'description')
@@ -259,4 +246,3 @@ class TaxRateAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-from django.urls import path, include
-=======
 from django.urls import path, include, reverse_lazy
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
 from django.contrib.auth import views as auth_views
 from . import views
 from .forms import CustomPasswordResetForm, CustomSetPasswordForm
@@ -26,12 +22,8 @@ urlpatterns = [
              template_name='ecommerce/password_reset.html',
              form_class=CustomPasswordResetForm,
              email_template_name='ecommerce/password_reset_email.html',
-<<<<<<< HEAD
-             subject_template_name='ecommerce/password_reset_subject.txt'
-=======
              subject_template_name='ecommerce/password_reset_subject.txt',
              success_url=reverse_lazy('ecommerce:password_reset_done')
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
          ),
          name='password_reset'),
     path('password-reset/done/',
@@ -42,12 +34,8 @@ urlpatterns = [
     path('password-reset/<uidb64>/<token>/',
          auth_views.PasswordResetConfirmView.as_view(
              template_name='ecommerce/password_reset_confirm.html',
-<<<<<<< HEAD
-             form_class=CustomSetPasswordForm
-=======
              form_class=CustomSetPasswordForm,
              success_url=reverse_lazy('ecommerce:password_reset_complete')
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
          ),
          name='password_reset_confirm'),
     path('password-reset/complete/',
@@ -56,10 +44,6 @@ urlpatterns = [
          ),
          name='password_reset_complete'),
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     # Social auth (Google OAuth)
     path('accounts/', include('allauth.urls')),
 

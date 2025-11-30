@@ -564,18 +564,13 @@ def checkout(request):
         payment_method = request.POST.get('payment_method', 'card')
         shipping_address = request.POST.get('shipping_address', '')
 
-<<<<<<< HEAD
         # Get admin-configured shipping and tax
         from .models import ShippingMethod, TaxRate
-=======
-        # Get shipping method and tax rate from admin configuration
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
         shipping_method = ShippingMethod.objects.filter(is_active=True).first()
         tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
 
         # Calculate totals
         subtotal = Decimal(str(cart.get_total()))
-<<<<<<< HEAD
         shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
         subtotal_with_coupon = subtotal - coupon_discount
 
@@ -585,18 +580,6 @@ def checkout(request):
             tax_amount = Decimal('0.00')
 
         total_amount = subtotal_with_coupon + shipping + tax_amount
-=======
-        shipping_cost = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
-
-        subtotal_with_coupon = subtotal - coupon_discount
-
-        if tax_rate:
-            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping_cost)))
-        else:
-            tax_amount = Decimal('0.00')
-
-        total_amount = subtotal_with_coupon + shipping_cost + tax_amount
 
         # Create order with references to shipping and tax
         order = Order.objects.create(
@@ -604,11 +587,7 @@ def checkout(request):
             shipping_method=shipping_method,
             tax_rate=tax_rate,
             subtotal=subtotal,
-<<<<<<< HEAD
             shipping_cost=shipping,
-=======
-            shipping_cost=shipping_cost,
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
             tax_amount=tax_amount,
             total_amount=total_amount,
             status='pending'
@@ -648,12 +627,8 @@ def checkout(request):
             messages.success(request, f'Order #{order.id} placed! Awaiting payment verification.')
             return redirect('ecommerce:order_detail', order_id=order.id)
 
-<<<<<<< HEAD
     # Get admin-configured shipping and tax
     from .models import ShippingMethod, TaxRate
-=======
-    # Get shipping method and tax rate from admin configuration
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     shipping_method = ShippingMethod.objects.filter(is_active=True).first()
     tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
 
@@ -676,11 +651,6 @@ def checkout(request):
         'coupon_discount': coupon_discount,
         'shipping': shipping,
         'shipping_method': shipping_method,
-<<<<<<< HEAD
-        'tax_amount': tax_amount,
-        'tax_rate': tax_rate,
-=======
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
         'tax_amount': tax_amount,
         'tax_rate': tax_rate,
         'total_amount': total_amount,
