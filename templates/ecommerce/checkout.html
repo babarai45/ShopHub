@@ -121,10 +121,10 @@
                                 {% endif %}
                                 <div>
                                     <p class="font-semibold text-gray-800">{{ item.product.name }}</p>
-                                    <p class="text-sm text-gray-600">Qty: {{ item.quantity }} x ${{ item.product.price }}</p>
+                                    <p class="text-sm text-gray-600">Qty: {{ item.quantity }} x ₨{{ item.product.price }}</p>
                                 </div>
                             </div>
-                            <p class="font-semibold text-lg">${{ item.get_total }}</p>
+                            <p class="font-semibold text-lg">₨{{ item.get_total }}</p>
                         </div>
                         {% endfor %}
                     </div>
@@ -161,12 +161,21 @@
 
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
+<<<<<<< HEAD
                         <span class="font-semibold">{% if shipping_method %}₨{{ shipping }} ({{ shipping_method.name }}){% else %}Not Set{% endif %}</span>
                     </div>
 
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
                         <span class="font-semibold">{% if tax_rate %}₨{{ tax_amount }} ({{ tax_rate.name }} - {{ tax_rate.rate_percentage }}%){% else %}₨0.00{% endif %}</span>
+=======
+                        <span class="font-semibold">₨{{ shipping }}</span>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Tax (10%)</span>
+                        <span class="font-semibold">₨{{ tax_amount }}</span>
+>>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
                     </div>
                 </div>
 

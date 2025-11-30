@@ -1,0 +1,73 @@
+QUICK SETUP GUIDE - SHIPPING & TAX
+
+Step 1: Start Server
+  cd E:\8th_semester\SEP\SepApp
+  python manage.py runserver 8000
+
+Step 2: Login to Admin
+  http://localhost:8000/admin/
+  Username: (your admin username)
+  Password: (your admin password)
+
+Step 3: Add Shipping Method
+  1. Click: ecommerce > Shipping Methods
+  2. Click: Add Shipping Method button
+  3. Fill in:
+     Name: Shipping Charge
+     Description: Standard shipping (optional)
+     Price: 6
+     Estimated Days: 3
+     Is Active: ✓ (checked)
+  4. Click: SAVE
+
+Step 4: Add Tax Rate
+  1. Click: ecommerce > Tax Rates
+  2. Click: Add Tax Rate button
+  3. Fill in:
+     Name: Dummy Tax
+     Description: No tax for demo (optional)
+     Rate Percentage: 0
+     Is Active: ✓ (checked)
+     Is Default: ✓ (checked)
+  4. Click: SAVE
+
+Step 5: Test Checkout
+  1. Go to: http://localhost:8000/
+  2. Add product to cart
+  3. Go to: http://localhost:8000/cart/
+  4. Should show:
+     - Shipping: ₨6.00 (from your setting)
+     - Tax: ₨0.00 (from your setting)
+  5. Click Checkout
+  6. Should show same values
+  7. Complete order
+
+Step 6: Verify Order
+  1. After order completes
+  2. View order detail
+  3. Should show:
+     Subtotal: ₨400.00 (or your amount)
+     Shipping: ₨6.00
+     Tax: ₨0.00
+     Total: ₨406.00
+
+Step 7: Download Invoice
+  1. On order detail page
+  2. Click: Download Invoice button
+  3. Should download invoice-{id}.txt file
+  4. Open in notepad to view
+
+WHAT'S FIXED:
+✓ Subtotal now shows correctly in order (not ₨0.00)
+✓ Shipping taken from admin ShippingMethod
+✓ Tax calculated from admin TaxRate
+✓ Invoice downloads working
+✓ All prices in PKR (₨)
+
+CHANGE SHIPPING/TAX ANYTIME:
+- Go to admin
+- Edit ShippingMethod price
+- Edit TaxRate percentage
+- All future orders use new values
+- Already created orders keep their original values
+

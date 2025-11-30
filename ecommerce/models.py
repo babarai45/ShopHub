@@ -180,6 +180,23 @@ class Order(models.Model):
     def __str__(self):
         return f"Order #{self.id} by {self.user.username}"
 
+    def calculate_totals(self):
+        """Calculate subtotal, tax, and total"""
+        self.subtotal = sum(item.price * item.quantity for item in self.items.all())
+
+        if self.tax_rate:
+            self.tax_amount = self.tax_rate.calculate_tax(self.subtotal)
+        else:
+            self.tax_amount = 0
+
+        if self.shipping_method:
+            self.shipping_cost = self.shipping_method.price
+        else:
+            self.shipping_cost = 0
+
+        self.total_amount = self.subtotal + self.tax_amount + self.shipping_cost
+        self.save()
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -261,11 +278,20 @@ class Coupon(models.Model):
 
 
 class ShippingMethod(models.Model):
+<<<<<<< HEAD
     """Shipping methods managed by admin"""
     name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
     estimated_days = models.IntegerField(default=3)
+=======
+    """Shipping methods that can be managed by admin"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    # Price in PKR (Pakistani Rupees)
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    estimated_days = models.IntegerField(default=3, help_text='Estimated delivery days')
+>>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -275,6 +301,7 @@ class ShippingMethod(models.Model):
         verbose_name_plural = 'Shipping Methods'
 
     def __str__(self):
+<<<<<<< HEAD
         return f"{self.name} - ₨{self.price:.2f}"
 
 
@@ -285,6 +312,23 @@ class TaxRate(models.Model):
     rate_percentage = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
     is_active = models.BooleanField(default=True)
     is_default = models.BooleanField(default=False)
+=======
+        return f"{self.name} - PKR {self.price:.2f}"
+
+
+class TaxRate(models.Model):
+    """Tax rates that can be managed by admin"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    rate_percentage = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        help_text='Tax rate as percentage (e.g., 17 for 17%)'
+    )
+    is_active = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=False, help_text='Set as default tax rate')
+>>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -296,5 +340,9 @@ class TaxRate(models.Model):
         return f"{self.name} - {self.rate_percentage}%"
 
     def calculate_tax(self, amount):
+<<<<<<< HEAD
         """Calculate tax amount"""
+=======
+        """Calculate tax amount for given amount"""
+>>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
         return (amount * self.rate_percentage) / 100

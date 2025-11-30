@@ -119,9 +119,9 @@
                         
                         <!-- Price -->
                         <div class="flex items-center gap-2 mt-3">
-                            <div class="text-2xl font-bold gradient-text">${{ product.price }}</div>
+                            <div class="text-2xl font-bold gradient-text">₨{{ product.price }}</div>
                             {% if product.original_price %}
-                                <span class="text-xs text-gray-500 line-through">${{ product.original_price }}</span>
+                                <span class="text-xs text-gray-500 line-through">₨{{ product.original_price }}</span>
                             {% endif %}
                         </div>
 
