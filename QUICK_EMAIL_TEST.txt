@@ -1,0 +1,83 @@
+QUICK TEST - PASSWORD RESET EMAIL
+
+Follow these steps to test the password reset email feature:
+
+STEP 1: START SERVER
+  cd E:\8th_semester\SEP\SepApp
+  python manage.py runserver 8000
+
+STEP 2: VISIT PASSWORD RESET PAGE
+  Open browser: http://127.0.0.1:8000/password-reset/
+
+STEP 3: ENTER EMAIL AND SUBMIT
+  Email: test@example.com (or any email)
+  Click: "Reset Password"
+
+STEP 4: CHECK SENT_EMAILS FOLDER
+  Open file explorer
+  Navigate to: E:\8th_semester\SEP\SepApp\sent_emails\
+  Look for a .log file (newest one)
+
+STEP 5: OPEN EMAIL FILE
+  Right-click the .log file
+  Click: "Open with Notepad"
+
+STEP 6: FIND PASSWORD RESET LINK
+  Look for a line starting with: http://127.0.0.1:8000/password-reset/
+  Example:
+  http://127.0.0.1:8000/password-reset/MQ/7va-xyz123abc456/
+
+STEP 7: TEST THE LINK
+  Copy the full URL
+  Paste in your browser address bar
+  Press Enter
+
+STEP 8: RESET PASSWORD
+  You should see a form asking for:
+  - New password
+  - Confirm password
+
+  Enter a new password
+  Click: "Change my password"
+
+STEP 9: SUCCESS
+  You'll see: "Password reset successful!"
+
+STEP 10: LOGIN WITH NEW PASSWORD
+  Go to: http://127.0.0.1:8000/login/
+  Login with your username/email and new password
+
+✓ PASSWORD RESET WORKS!
+
+KEY POINTS:
+
+- Emails aren't sent to your inbox (development mode)
+- They're saved in sent_emails/ folder
+- The password reset link is real and works
+- You can reset any user's password this way
+- Perfect for testing!
+
+MULTIPLE RESETS:
+
+Each time you request a password reset:
+- A new email file is created in sent_emails/
+- The newest file is the latest request
+- Each file is independent
+- Multiple files can exist at once
+
+TROUBLESHOOTING:
+
+No .log file in sent_emails/?
+  1. Did you submit the form? (click button!)
+  2. Is sent_emails/ folder created? (should exist in project root)
+  3. Restart Django server (stop with Ctrl+C, run again)
+  4. Clear browser cache and reload
+
+Link doesn't work?
+  1. Make sure Django server is running
+  2. Check the URL has no typos
+  3. Check your network/firewall isn't blocking
+  4. Restart server and try again
+
+That's it! Your password reset is fully working! 🎉
+
