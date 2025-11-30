@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory, TrendingImage, Order, OrderItem, Coupon
+from .models import Category, Product, UserProfile, Cart, CartItem, Wishlist, BlogPost, BlogCategory, TrendingImage, Order, OrderItem, Coupon, ShippingMethod, TaxRate
 
 
 @admin.register(Category)
@@ -165,11 +165,11 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(Coupon)
 class CouponAdmin(admin.ModelAdmin):
-    list_display = ('code', 'discount_type', 'discount_value', 'is_active', 'current_uses', 'max_uses', 'valid_from', 'valid_until', 'created_at')
-    list_filter = ('discount_type', 'is_active', 'valid_from', 'valid_until', 'created_at')
+    list_display = ('code', 'discount_type', 'discount_value', 'is_active', 'is_featured', 'current_uses', 'max_uses', 'valid_from', 'valid_until', 'created_at')
+    list_filter = ('discount_type', 'is_active', 'is_featured', 'valid_from', 'valid_until', 'created_at')
     search_fields = ('code', 'description')
     readonly_fields = ('current_uses', 'created_at', 'updated_at')
-    list_editable = ('is_active',)
+    list_editable = ('is_active', 'is_featured')
 
     fieldsets = (
         ('🎟️ Coupon Code', {
@@ -184,8 +184,28 @@ class CouponAdmin(admin.ModelAdmin):
         ('📅 Validity', {
             'fields': ('valid_from', 'valid_until', 'is_active')
         }),
+        ('🏠 Display Settings', {
+            'fields': ('is_featured',),
+            'description': 'Check to show this coupon on home page'
+        }),
         ('📊 Timestamps', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
+
+
+@admin.register(ShippingMethod)
+class ShippingMethodAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'estimated_days', 'is_active')
+    list_editable = ('is_active',)
+    search_fields = ('name',)
+    list_filter = ('is_active',)
+
+
+@admin.register(TaxRate)
+class TaxRateAdmin(admin.ModelAdmin):
+    list_display = ('name', 'rate_percentage', 'is_active', 'is_default')
+    list_editable = ('is_active', 'is_default')
+    search_fields = ('name',)
+    list_filter = ('is_active', 'is_default')

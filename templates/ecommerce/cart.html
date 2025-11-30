@@ -91,21 +91,21 @@
                 <div class="space-y-4 border-b pb-6 mb-6">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Subtotal</span>
-                        <span class="font-semibold" data-subtotal>${{ subtotal }}</span>
+                        <span class="font-semibold" data-subtotal>₨{{ subtotal }}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-semibold">$5.00</span>
+                        <span class="font-semibold">{% if shipping_method %}₨{{ shipping }}{% else %}Not Set{% endif %}</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-gray-600">Tax</span>
-                        <span class="font-semibold" data-tax>${{ tax_amount }}</span>
+                        <span class="font-semibold" data-tax>{% if tax_rate %}₨{{ tax_amount }}{% else %}₨0.00{% endif %}</span>
                     </div>
                 </div>
 
                 <div class="flex justify-between mb-6 text-xl font-bold">
                     <span>Total</span>
-                    <span class="gradient-text" data-total>${{ total_amount }}</span>
+                    <span class="gradient-text" data-total>₨{{ total_amount }}</span>
                 </div>
 
                 {% if cart.items.all %}

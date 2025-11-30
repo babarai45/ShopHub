@@ -11,16 +11,27 @@ from django.http import JsonResponse
 
 def home(request):
     """Homepage with featured products"""
-    from .models import TrendingImage
+    from .models import TrendingImage, Coupon
+    from django.utils import timezone
 
     featured_products = Product.objects.filter(is_active=True)[:8]
     categories = Category.objects.all()
     trending_images = TrendingImage.objects.filter(is_active=True)
 
+    # Get featured coupon if available and valid
+    now = timezone.now()
+    featured_coupon = Coupon.objects.filter(
+        is_featured=True,
+        is_active=True,
+        valid_from__lte=now,
+        valid_until__gte=now
+    ).first()
+
     context = {
         'featured_products': featured_products,
         'categories': categories,
         'trending_images': trending_images,
+        'featured_coupon': featured_coupon,
         'page_title': 'Home'
     }
     return render(request, 'ecommerce/home.html', context)
@@ -182,6 +193,15 @@ def add_to_cart(request, product_id):
 
     quantity = int(request.POST.get('quantity', 1))
 
+    # Validate stock
+    if quantity > product.stock:
+        messages.error(request, f'Only {product.stock} items available in stock!')
+        return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
+    if quantity <= 0:
+        messages.error(request, 'Quantity must be greater than 0!')
+        return redirect(request.META.get('HTTP_REFERER', 'ecommerce:home'))
+
     cart_item, created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
@@ -189,7 +209,12 @@ def add_to_cart(request, product_id):
     )
 
     if not created:
-        cart_item.quantity += quantity
+        # Check if total quantity exceeds stock
+        new_quantity = cart_item.quantity + quantity
+        if new_quantity > product.stock:
+            messages.error(request, f'Only {product.stock - cart_item.quantity} more items can be added!')
+            return redirect('ecommerce:cart')
+        cart_item.quantity = new_quantity
         cart_item.save()
 
     messages.success(request, f'{product.name} added to cart!')
@@ -200,22 +225,34 @@ def add_to_cart(request, product_id):
 def cart_view(request):
     """View shopping cart"""
     from decimal import Decimal
+    from .models import ShippingMethod, TaxRate
 
     try:
         cart = Cart.objects.get(user=request.user)
     except Cart.DoesNotExist:
         cart = Cart.objects.create(user=request.user)
 
+    # Get admin-configured shipping and tax
+    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
     subtotal = Decimal(str(cart.get_total()))
-    shipping = Decimal('5.00')
-    tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+    shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
+
+    if tax_rate:
+        tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal + shipping)))
+    else:
+        tax_amount = Decimal('0.00')
+
     total_amount = subtotal + shipping + tax_amount
 
     context = {
         'cart': cart,
         'subtotal': subtotal,
         'shipping': shipping,
+        'shipping_method': shipping_method,
         'tax_amount': tax_amount,
+        'tax_rate': tax_rate,
         'total_amount': total_amount,
         'page_title': 'Shopping Cart'
     }
@@ -238,10 +275,18 @@ def update_cart_item(request, cart_item_id):
     cart_item = get_object_or_404(CartItem, id=cart_item_id, cart__user=request.user)
     quantity = int(request.POST.get('quantity', 1))
 
-    if quantity > 0:
-        cart_item.quantity = quantity
-        cart_item.save()
-        messages.success(request, 'Cart updated!')
+    # Validate stock
+    if quantity > cart_item.product.stock:
+        messages.error(request, f'Only {cart_item.product.stock} items available in stock!')
+        return redirect('ecommerce:cart')
+
+    if quantity <= 0:
+        messages.error(request, 'Quantity must be greater than 0!')
+        return redirect('ecommerce:cart')
+
+    cart_item.quantity = quantity
+    cart_item.save()
+    messages.success(request, 'Cart updated!')
 
     return redirect('ecommerce:cart')
 
@@ -321,10 +366,20 @@ def update_cart_item_ajax(request, cart_item_id):
             return JsonResponse({'success': False, 'message': 'Quantity must be at least 1'})
 
         # Calculate new totals
+        from .models import ShippingMethod, TaxRate
+
         cart = cart_item.cart
+        shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
         subtotal = Decimal(str(cart.get_total()))
-        shipping = Decimal('5.00')
-        tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+        shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
+
+        if tax_rate:
+            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal + shipping)))
+        else:
+            tax_amount = Decimal('0.00')
+
         total_amount = subtotal + shipping + tax_amount
 
         return JsonResponse({
@@ -509,16 +564,31 @@ def checkout(request):
         payment_method = request.POST.get('payment_method', 'card')
         shipping_address = request.POST.get('shipping_address', '')
 
+        # Get admin-configured shipping and tax
+        from .models import ShippingMethod, TaxRate
+        shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
         # Calculate totals
         subtotal = Decimal(str(cart.get_total()))
-        shipping = Decimal('5.00')
+        shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
         subtotal_with_coupon = subtotal - coupon_discount
-        tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+
+        if tax_rate:
+            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping)))
+        else:
+            tax_amount = Decimal('0.00')
+
         total_amount = subtotal_with_coupon + shipping + tax_amount
 
         # Create order
         order = Order.objects.create(
             user=request.user,
+            shipping_method=shipping_method,
+            tax_rate=tax_rate,
+            subtotal=subtotal,
+            shipping_cost=shipping,
+            tax_amount=tax_amount,
             total_amount=total_amount,
             status='pending'
         )
@@ -557,11 +627,21 @@ def checkout(request):
             messages.success(request, f'Order #{order.id} placed! Awaiting payment verification.')
             return redirect('ecommerce:order_detail', order_id=order.id)
 
+    # Get admin-configured shipping and tax
+    from .models import ShippingMethod, TaxRate
+    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
     # Calculate totals
     subtotal = Decimal(str(cart.get_total()))
-    shipping = Decimal('5.00')
+    shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
     subtotal_with_coupon = subtotal - coupon_discount
-    tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+
+    if tax_rate:
+        tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping)))
+    else:
+        tax_amount = Decimal('0.00')
+
     total_amount = subtotal_with_coupon + shipping + tax_amount
 
     context = {
@@ -570,6 +650,9 @@ def checkout(request):
         'subtotal': subtotal,
         'coupon_discount': coupon_discount,
         'shipping': shipping,
+        'shipping_method': shipping_method,
+        'tax_amount': tax_amount,
+        'tax_rate': tax_rate,
         'tax_amount': tax_amount,
         'total_amount': total_amount,
         'applied_coupon': applied_coupon,
@@ -629,10 +712,20 @@ def apply_coupon(request):
         request.session['applied_coupon'] = coupon.code
         coupon_discount = Decimal(str(coupon.get_discount_amount(subtotal)))
 
+        # Get admin-configured shipping and tax
+        from .models import ShippingMethod, TaxRate
+        shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
         # Recalculate totals
         subtotal_with_coupon = subtotal - coupon_discount
-        shipping = Decimal('5.00')
-        tax_amount = round((subtotal_with_coupon + shipping) * Decimal('0.1'), 2)
+        shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
+
+        if tax_rate:
+            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal_with_coupon + shipping)))
+        else:
+            tax_amount = Decimal('0.00')
+
         total_amount = subtotal_with_coupon + shipping + tax_amount
 
         return JsonResponse({
@@ -667,10 +760,20 @@ def remove_coupon(request):
         if 'applied_coupon' in request.session:
             del request.session['applied_coupon']
 
-        # Recalculate totals without coupon
+        # Get admin-configured shipping and tax
+        from .models import ShippingMethod, TaxRate
+        shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+
+        # Recalculate totals without coupon using admin config
         subtotal = Decimal(str(cart.get_total()))
-        shipping = Decimal('5.00')
-        tax_amount = round((subtotal + shipping) * Decimal('0.1'), 2)
+        shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
+
+        if tax_rate:
+            tax_amount = Decimal(str(tax_rate.calculate_tax(subtotal + shipping)))
+        else:
+            tax_amount = Decimal('0.00')
+
         total_amount = subtotal + shipping + tax_amount
 
         return JsonResponse({

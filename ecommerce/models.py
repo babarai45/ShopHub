@@ -160,7 +160,17 @@ class Order(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+    # Shipping and Tax
+    shipping_method = models.ForeignKey('ShippingMethod', on_delete=models.SET_NULL, null=True, blank=True)
+    tax_rate = models.ForeignKey('TaxRate', on_delete=models.SET_NULL, null=True, blank=True)
+
+    # Amount breakdown
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -212,6 +222,7 @@ class Coupon(models.Model):
     max_uses = models.IntegerField(default=100, help_text='Maximum uses of this coupon')
     current_uses = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False, help_text='Show this coupon on home page')
     valid_from = models.DateTimeField()
     valid_until = models.DateTimeField()
     description = models.TextField(blank=True)
@@ -247,3 +258,43 @@ class Coupon(models.Model):
         """Mark coupon as used"""
         self.current_uses += 1
         self.save()
+
+
+class ShippingMethod(models.Model):
+    """Shipping methods managed by admin"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    estimated_days = models.IntegerField(default=3)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('price',)
+        verbose_name_plural = 'Shipping Methods'
+
+    def __str__(self):
+        return f"{self.name} - ₨{self.price:.2f}"
+
+
+class TaxRate(models.Model):
+    """Tax rates managed by admin"""
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    rate_percentage = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+    is_active = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ('rate_percentage',)
+        verbose_name_plural = 'Tax Rates'
+
+    def __str__(self):
+        return f"{self.name} - {self.rate_percentage}%"
+
+    def calculate_tax(self, amount):
+        """Calculate tax amount"""
+        return (amount * self.rate_percentage) / 100

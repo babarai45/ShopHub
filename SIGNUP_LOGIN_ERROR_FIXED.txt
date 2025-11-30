@@ -1,0 +1,99 @@
+SIGNUP/LOGIN DOESNOT EXIST ERROR - FIXED ✅
+
+═══════════════════════════════════════════════════════════════════════════
+
+ERROR DETAILS:
+  DoesNotExist at /signup/
+  DoesNotExist at /login/
+
+CAUSE:
+  Django template processor was evaluating {% provider_login_url 'google' %}
+  even though it was inside HTML comments (<!-- -->).
+
+  The Google OAuth app wasn't configured in admin, causing the error.
+
+═══════════════════════════════════════════════════════════════════════════
+
+SOLUTION APPLIED:
+
+Removed from signup.html:
+  ✓ "Or sign up with" divider section
+  ✓ Entire Google OAuth commented block
+  ✓ All template tags that reference provider_login_url
+
+Removed from login.html:
+  ✓ "Or continue with" divider section
+  ✓ Entire Google OAuth commented block
+  ✓ All template tags that reference provider_login_url
+
+Added to both files:
+  ✓ Simple "Sign In" / "Sign Up" links instead
+  ✓ Clean, simple alternative account navigation
+
+═══════════════════════════════════════════════════════════════════════════
+
+FILES MODIFIED:
+
+1. templates/ecommerce/signup.html
+   - Removed divider and Google OAuth section
+   - Kept simple "Already have an account? Sign In" link
+
+2. templates/ecommerce/login.html
+   - Removed divider and Google OAuth section
+   - Kept simple "Don't have an account? Sign Up" link
+
+═══════════════════════════════════════════════════════════════════════════
+
+VERIFICATION:
+
+✓ Django system check: PASSED
+✓ No template syntax errors
+✓ Signup page now loads without error
+✓ Login page now loads without error
+✓ Navigation links work correctly
+✓ No missing dependencies
+
+═══════════════════════════════════════════════════════════════════════════
+
+HOW TO TEST:
+
+1. Start server:
+   python manage.py runserver 8000
+
+2. Test signup:
+   http://localhost:8000/signup/
+   Should load without DoesNotExist error
+
+3. Test login:
+   http://localhost:8000/login/
+   Should load without DoesNotExist error
+
+4. Test navigation:
+   Click "Sign In" link on signup page
+   Click "Sign Up" link on login page
+   Both should work correctly
+
+═══════════════════════════════════════════════════════════════════════════
+
+IMPORTANT NOTE:
+
+The issue was that Django processes template tags BEFORE checking if they're
+in HTML comments. Even though the code was in HTML comments (<!-- -->),
+Django still tried to evaluate {% provider_login_url 'google' %}, which
+failed because:
+
+1. The allauth package was installed
+2. But Google OAuth app wasn't configured in admin
+3. So the template tag raised a DoesNotExist error
+
+The fix was to completely remove this problematic code rather than trying
+to comment it out, since comments don't prevent template tag evaluation.
+
+═══════════════════════════════════════════════════════════════════════════
+
+STATUS: ✅ COMPLETE
+
+Both signup and login pages now work correctly without any DoesNotExist errors.
+
+═══════════════════════════════════════════════════════════════════════════
+

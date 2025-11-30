@@ -59,6 +59,106 @@
     </div>
 </div>
 
+<!-- Featured Coupon Banner -->
+{% if featured_coupon %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 p-8 md:p-12 shadow-2xl">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-0 left-0 w-40 h-40 bg-white rounded-full mix-blend-screen filter blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-0 right-0 w-40 h-40 bg-white rounded-full mix-blend-screen filter blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                <!-- Offer Text -->
+                <div>
+                    <p class="text-white text-sm font-semibold mb-2 uppercase tracking-widest">🎉 Limited Time Offer</p>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Save Big!</h2>
+                    <p class="text-white text-opacity-90">Get {{ featured_coupon.discount_value }}% OFF on your purchase</p>
+                </div>
+
+                <!-- Coupon Code -->
+                <div class="flex justify-center">
+                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-6 border-2 border-white border-opacity-30 text-center">
+                        <p class="text-white text-sm font-semibold mb-3 uppercase">Use Code</p>
+                        <p class="text-white text-4xl font-bold font-mono mb-3 tracking-widest" id="coupon-code">{{ featured_coupon.code }}</p>
+                        <button onclick="copyCoupon('{{ featured_coupon.code }}')" class="bg-white text-pink-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 smooth-transition text-sm">
+                            <i class="fas fa-copy mr-2"></i>Copy Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="text-center">
+                    <p class="text-white text-sm font-semibold mb-4 uppercase tracking-widest">⏱️ Offer Ends In</p>
+                    <div class="grid grid-cols-4 gap-2" id="countdown">
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
+                            <div class="text-white text-2xl font-bold" id="days">00</div>
+                            <div class="text-white text-xs font-semibold uppercase">Days</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
+                            <div class="text-white text-2xl font-bold" id="hours">00</div>
+                            <div class="text-white text-xs font-semibold uppercase">Hours</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
+                            <div class="text-white text-2xl font-bold" id="minutes">00</div>
+                            <div class="text-white text-xs font-semibold uppercase">Mins</div>
+                        </div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
+                            <div class="text-white text-2xl font-bold" id="seconds">00</div>
+                            <div class="text-white text-xs font-semibold uppercase">Secs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Button -->
+            <div class="text-center mt-8">
+                <a href="{% url 'ecommerce:product_list' %}" class="inline-block bg-white text-pink-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 smooth-transition text-lg shadow-lg">
+                    Shop Now & Save! →
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function copyCoupon(code) {
+    navigator.clipboard.writeText(code);
+    alert('Coupon code copied: ' + code);
+}
+
+function startCountdown() {
+    const validUntil = new Date('{{ featured_coupon.valid_until|date:"Y-m-d\TH:i:s" }}').getTime();
+
+    const timer = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = validUntil - now;
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById('days').textContent = String(days).padStart(2, '0');
+        document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+
+        if (distance < 0) {
+            clearInterval(timer);
+            document.getElementById('countdown').innerHTML = '<p class="text-white font-bold col-span-4">Offer Expired</p>';
+        }
+    }, 1000);
+}
+
+// Start countdown when page loads
+document.addEventListener('DOMContentLoaded', startCountdown);
+</script>
+{% endif %}
+
 <!-- Trending Images Slider Section -->
 {% if trending_images %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

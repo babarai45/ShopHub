@@ -149,30 +149,30 @@
                 <div class="space-y-4 border-b pb-6 mb-6">
                     <div class="flex justify-between">
                         <span class="text-gray-600">Subtotal</span>
-                        <span class="font-semibold">${{ subtotal }}</span>
+                        <span class="font-semibold">₨{{ subtotal }}</span>
                     </div>
 
                     {% if applied_coupon %}
                     <div class="flex justify-between text-green-600">
                         <span>Discount ({{ applied_coupon.code }})</span>
-                        <span class="font-semibold">-${{ coupon_discount }}</span>
+                        <span class="font-semibold">-₨{{ coupon_discount }}</span>
                     </div>
                     {% endif %}
 
                     <div class="flex justify-between">
                         <span class="text-gray-600">Shipping</span>
-                        <span class="font-semibold">${{ shipping }}</span>
+                        <span class="font-semibold">{% if shipping_method %}₨{{ shipping }} ({{ shipping_method.name }}){% else %}Not Set{% endif %}</span>
                     </div>
 
                     <div class="flex justify-between">
-                        <span class="text-gray-600">Tax (10%)</span>
-                        <span class="font-semibold">${{ tax_amount }}</span>
+                        <span class="text-gray-600">Tax</span>
+                        <span class="font-semibold">{% if tax_rate %}₨{{ tax_amount }} ({{ tax_rate.name }} - {{ tax_rate.rate_percentage }}%){% else %}₨0.00{% endif %}</span>
                     </div>
                 </div>
 
                 <div class="flex justify-between mb-6 text-xl font-bold">
                     <span>Total</span>
-                    <span class="gradient-text">${{ total_amount }}</span>
+                    <span class="gradient-text">₨{{ total_amount }}</span>
                 </div>
 
                 <!-- Promo Code -->
