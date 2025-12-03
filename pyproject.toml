@@ -12,9 +12,8 @@ dependencies = [
     "pillow>=12.0.0",
     "pyjwt>=2.10.1",
     "python-decouple==3.8",
-<<<<<<< HEAD
-=======
+
     "reportlab>=4.4.5",
->>>>>>> 343eace34e7c27e3b092fb5072273f3b6e1a3f1f
+
     "requests==2.31.0",
 ]
