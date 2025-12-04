@@ -32,15 +32,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
-                <a href="{% url 'ecommerce:home' %}" class="flex items-center space-x-2">
+                <a href="{% url 'ecommerce:home' %}" class="flex items-center space-x-2 flex-shrink-0">
                     <div class="gradient-bg p-2 rounded-lg">
                         <i class="fas fa-shopping-bag text-white text-xl"></i>
                     </div>
-                    <span class="gradient-text text-2xl font-bold">ShopHub</span>
+                    <span class="gradient-text text-2xl font-bold hidden sm:inline">ShopHub</span>
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="hidden lg:flex items-center space-x-8">
                     <a href="{% url 'ecommerce:home' %}" class="text-gray-700 hover:gradient-text smooth-transition">
                         🏠 Home
                     </a>
@@ -53,16 +53,10 @@
                     <a href="{% url 'ecommerce:blog' %}" class="text-gray-700 hover:gradient-text smooth-transition">
                         📚 Blog
                     </a>
-                    <div class="relative group">
-                        <button class="text-gray-700 hover:gradient-text smooth-transition flex items-center space-x-1">
-                            <span>📁 Categories</span>
-                            <i class="fas fa-chevron-down text-xs"></i>
-                        </button>
-                    </div>
                 </div>
 
                 <!-- Right Side Icons -->
-                <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 sm:space-x-4">
                     <!-- Search -->
                     <a href="{% url 'ecommerce:product_list' %}" class="text-gray-700 hover:text-blue-600 smooth-transition">
                         <i class="fas fa-search text-lg"></i>
@@ -90,12 +84,12 @@
                         {% endif %}
                     </a>
 
-                    <!-- User Menu -->
+                    <!-- User Menu Desktop -->
                     {% if user.is_authenticated %}
-                    <div class="relative group">
+                    <div class="hidden md:block relative group">
                         <button class="flex items-center space-x-2 text-gray-700 hover:gradient-text smooth-transition">
                             <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}" class="w-8 h-8 rounded-full object-cover">
-                            <span class="hidden sm:inline">{{ user.username }}</span>
+                            <span class="hidden lg:inline text-sm">{{ user.username }}</span>
                         </button>
                         <div class="absolute right-0 mt-0 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible smooth-transition">
                             <a href="{% url 'ecommerce:profile' %}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
@@ -106,13 +100,13 @@
                             </a>
                             {% if user.is_staff %}
                             <hr>
-                            <a href="/admin/ecommerce/trendingimage/" class="block px-4 py-2 text-orange-600 hover:bg-orange-50 font-semibold">
+                            <a href="/admin/ecommerce/trendingimage/" class="block px-4 py-2 text-orange-600 hover:bg-orange-50 font-semibold text-sm">
                                 <i class="fas fa-images mr-2"></i>🖼️ Manage Sliders
                             </a>
-                            <a href="/admin/ecommerce/blogpost/" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 font-semibold">
+                            <a href="/admin/ecommerce/blogpost/" class="block px-4 py-2 text-blue-600 hover:bg-blue-50 font-semibold text-sm">
                                 <i class="fas fa-blog mr-2"></i>📝 Manage Blog
                             </a>
-                            <a href="/admin/" class="block px-4 py-2 text-purple-600 hover:bg-purple-50 font-semibold">
+                            <a href="/admin/" class="block px-4 py-2 text-purple-600 hover:bg-purple-50 font-semibold text-sm">
                                 <i class="fas fa-cog mr-2"></i>⚙️ Admin Panel
                             </a>
                             {% endif %}
@@ -123,14 +117,92 @@
                         </div>
                     </div>
                     {% else %}
-                    <a href="{% url 'ecommerce:login' %}" class="gradient-bg text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition">
+                    <a href="{% url 'ecommerce:login' %}" class="hidden sm:block gradient-bg text-white px-4 py-2 rounded-lg hover:shadow-lg smooth-transition text-sm">
                         Login
+                    </a>
+                    {% endif %}
+
+                    <!-- Mobile Menu Button -->
+                    <button id="mobile-menu-btn" class="lg:hidden text-gray-700 hover:gradient-text smooth-transition ml-2">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-white border-t border-gray-200 shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                <!-- Mobile Menu Links -->
+                <div class="space-y-3 mb-4">
+                    <a href="{% url 'ecommerce:home' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <a href="{% url 'ecommerce:product_list' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-shopping-bag mr-2"></i>Products
+                    </a>
+                    <a href="{% url 'ecommerce:about' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-info-circle mr-2"></i>About
+                    </a>
+                    <a href="{% url 'ecommerce:blog' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-book mr-2"></i>Blog
+                    </a>
+
+                    {% if user.is_authenticated %}
+                    <hr class="my-2">
+                    <a href="{% url 'ecommerce:profile' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-user mr-2"></i>Profile
+                    </a>
+                    {% if user.is_staff %}
+                    <a href="/admin/ecommerce/trendingimage/" class="block px-3 py-2 rounded-lg text-orange-600 hover:bg-orange-50 smooth-transition font-semibold">
+                        <i class="fas fa-images mr-2"></i>Manage Sliders
+                    </a>
+                    <a href="/admin/ecommerce/blogpost/" class="block px-3 py-2 rounded-lg text-blue-600 hover:bg-blue-50 smooth-transition font-semibold">
+                        <i class="fas fa-blog mr-2"></i>Manage Blog
+                    </a>
+                    <a href="/admin/" class="block px-3 py-2 rounded-lg text-purple-600 hover:bg-purple-50 smooth-transition font-semibold">
+                        <i class="fas fa-cog mr-2"></i>Admin Panel
+                    </a>
+                    {% endif %}
+                    <hr class="my-2">
+                    <a href="{% url 'ecommerce:logout' %}" class="block px-3 py-2 rounded-lg text-gray-700 hover:bg-gray-100 smooth-transition">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </a>
+                    {% else %}
+                    <hr class="my-2">
+                    <a href="{% url 'ecommerce:login' %}" class="block px-3 py-2 rounded-lg gradient-bg text-white hover:shadow-lg smooth-transition text-center">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </a>
+                    <a href="{% url 'ecommerce:signup' %}" class="block px-3 py-2 rounded-lg border-2 border-blue-600 text-blue-600 hover:bg-blue-50 smooth-transition text-center">
+                        <i class="fas fa-user-plus mr-2"></i>Sign Up
                     </a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </nav>
+
+    <!-- Mobile Menu Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuBtn) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+
+                // Close menu when a link is clicked
+                const menuLinks = mobileMenu.querySelectorAll('a');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+            }
+        });
+    </script>
 
     <!-- Messages -->
     {% if messages %}
