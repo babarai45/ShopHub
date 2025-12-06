@@ -66,7 +66,9 @@ class UserProfile(models.Model):
     state = models.CharField(max_length=100, blank=True)
     postal_code = models.CharField(max_length=20, blank=True)
     country = models.CharField(max_length=100, blank=True)
-    profile_image = models.ImageField(upload_to='profiles/', default='profiles/default.png')
+
+    # profile_image = models.ImageField(upload_to='profiles/', default='profiles/default.png')
+    profile_image = CloudinaryField('profile_image', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -133,7 +135,10 @@ class BlogPost(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     content = models.TextField()
     short_description = models.CharField(max_length=500)
-    image = models.ImageField(upload_to='blog/', default='blog/default.png')
+
+    # image = models.ImageField(upload_to='blog/', default='blog/default.png')
+    image = CloudinaryField('image', blank=True, null=True)
+
     emoji = models.CharField(max_length=10, default='📝')
     is_published = models.BooleanField(default=False)
     is_featured = models.BooleanField(default=False)
@@ -217,7 +222,10 @@ class OrderItem(models.Model):
 class TrendingImage(models.Model):
     title = models.CharField(max_length=200)
     subtitle = models.CharField(max_length=500, blank=True)
-    image = models.ImageField(upload_to='trending/')
+
+    # image = models.ImageField(upload_to='trending/')
+    image = CloudinaryField('image', blank=True, null=True)
+
     link = models.URLField(blank=True, help_text='Link when image is clicked')
     order = models.IntegerField(default=0, help_text='Order in slider (0 = first)')
     is_active = models.BooleanField(default=True)
