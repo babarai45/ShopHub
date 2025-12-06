@@ -35,7 +35,7 @@
                         </div>
 
                         <!-- Quantity and Actions -->
-                        <div class="flex flex-row sm:flex-col items-center justify-between sm:justify-between gap-4">
+                        <div class="flex flex-row sm:flex-col items-center justify-between gap-4">
                             <form method="post" action="{% url 'ecommerce:update_cart_item_ajax' item.id %}" class="flex items-center border border-gray-300 rounded-lg qty-form">
                                 {% csrf_token %}
                                 <button type="button" onclick="decreaseQty(this)" class="px-3 py-1 text-gray-600">
