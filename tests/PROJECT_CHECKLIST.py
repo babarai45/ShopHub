@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
 FINAL PROJECT COMPLETION CHECKLIST
-ShopHub E-Commerce Application
+Order2Wear E-Commerce Application
 """
 
 def print_checklist():
     print("\n" + "="*80)
-    print(" "*15 + "SHOPHUB E-COMMERCE APPLICATION")
+    print(" "*15 + "ORDER2WEAR E-COMMERCE APPLICATION")
     print(" "*20 + "PROJECT COMPLETION CHECKLIST")
     print("="*80 + "\n")
 

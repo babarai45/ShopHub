@@ -1,8 +1,8 @@
-# ShopHub User Guide 👥
+# Order2Wear User Guide 👥
 
-## How to Use ShopHub as a Customer
+## How to Use Order2Wear as a Customer
 
-This guide explains how to use ShopHub to browse products, shop, and manage your orders.
+This guide explains how to use Order2Wear to browse products, shop, and manage your orders.
 
 ---
 
@@ -314,7 +314,7 @@ A: Go to "My Orders" and click the order to see status
 A: Check shipping method details - usually 2-5 business days
 
 **Q: Can I cancel an order?**
-A: Contact support at support@shophub.com
+A: Contact support at support@order2wear.com
 
 **Q: How do I reset password?**
 A: Click "Forgot password?" on login page
@@ -335,7 +335,7 @@ A: Contact support with order number
 A: Check return policy or contact support
 
 **Q: How do I contact support?**
-A: Email: support@shophub.com
+A: Email: support@order2wear.com
 
 ---
 
@@ -352,7 +352,7 @@ A: Email: support@shophub.com
 
 ## 📞 Contact & Support
 
-**Email:** support@shophub.com
+**Email:** support@order2wear.com
 **Hours:** 24/7
 **Response:** Within 24 hours
 

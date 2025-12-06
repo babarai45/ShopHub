@@ -1,8 +1,8 @@
-# ShopHub Admin Guide 🎛️
+# Order2Wear Admin Guide 🎛️
 
-## How to Manage ShopHub as an Administrator
+## How to Manage Order2Wear as an Administrator
 
-This guide explains how to manage all aspects of ShopHub through the admin panel.
+This guide explains how to manage all aspects of Order2Wear through the admin panel.
 
 ---
 
@@ -38,7 +38,7 @@ python manage.py createsuperuser
 
 You'll be prompted for:
 - **Username:** admin
-- **Email:** admin@shophub.com
+- **Email:** admin@order2wear.com
 - **Password:** your-secure-password
 
 ---
@@ -513,7 +513,7 @@ See:
 ## 📞 Support
 
 For admin support:
-- Email: support@shophub.com
+- Email: support@order2wear.com
 - Check developer guide for technical issues
 
 ---

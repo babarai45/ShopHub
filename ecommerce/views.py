@@ -342,7 +342,7 @@ def share_product(request, product_id):
     context = {
         'product': product,
         'share_url': product_url,
-        'share_text': f'Check out {product.name} on ShopHub!',
+        'share_text': f'Check out {product.name} on Order2Wear!',
     }
     return render(request, 'ecommerce/share_product.html', context)
 
@@ -847,7 +847,7 @@ def download_invoice(request, order_id):
     )
 
     # Title
-    elements.append(Paragraph("🛍️ ShopHub Invoice", title_style))
+    elements.append(Paragraph("🛍️ Order2Wear Invoice", title_style))
     elements.append(Spacer(1, 0.2*inch))
 
     # Invoice header info
@@ -952,8 +952,8 @@ def download_invoice(request, order_id):
         alignment=1
     )
     elements.append(Paragraph("Thank you for your purchase!", footer_style))
-    elements.append(Paragraph("For any queries, contact: support@shophub.com", footer_style))
-    elements.append(Paragraph("Visit us: www.shophub.com", footer_style))
+    elements.append(Paragraph("For any queries, contact: support@order2wear.com", footer_style))
+    elements.append(Paragraph("Visit us: www.order2wear.com", footer_style))
 
     # Build PDF
     doc.build(elements)

@@ -1,15 +1,15 @@
-# ShopHub Ecommerce - Documentation Outline
+# Order2Wear Ecommerce - Documentation Outline
 
 ## 📚 Documentation Structure
 
-This folder contains comprehensive documentation for the ShopHub ecommerce platform. All documentation is organized by audience and use case.
+This folder contains comprehensive documentation for the Order2Wear ecommerce platform. All documentation is organized by audience and use case.
 
 ---
 
 ## 📖 Documentation Files
 
 ### 1. **README.md** - Project Overview
-- What is ShopHub?
+- What is Order2Wear?
 - Key Features
 - Technology Stack
 - Project Requirements
@@ -134,7 +134,7 @@ Quick reference to all documentation
 1. Check the relevant guide above
 2. Search within the documentation
 3. Check DEVELOPER_GUIDE.md for common issues
-4. Contact support: support@shophub.com
+4. Contact support: support@order2wear.com
 
 ---
 

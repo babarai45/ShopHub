@@ -9,7 +9,7 @@ from ecommerce.models import Category, Product
 
 # Create superuser
 if not User.objects.filter(username='admin').exists():
-    User.objects.create_superuser('admin', 'admin@shophub.com', 'admin123')
+    User.objects.create_superuser('admin', 'admin@order2wear.com', 'admin123')
     print("✓ Superuser 'admin' created successfully")
 else:
     print("✓ Superuser 'admin' already exists")

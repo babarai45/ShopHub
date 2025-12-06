@@ -1,6 +1,6 @@
-# ShopHub - Modern Ecommerce Platform
+# Order2Wear - Modern Ecommerce Platform
 
-![ShopHub](https://img.shields.io/badge/ShopHub-Ecommerce-blue)
+![Order2Wear](https://img.shields.io/badge/Order2Wear-Ecommerce-blue)
 ![Django](https://img.shields.io/badge/Django-5.2.8-green)
 ![Python](https://img.shields.io/badge/Python-3.14-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
@@ -9,7 +9,7 @@
 
 ## 📌 Project Overview
 
-**ShopHub** is a modern, feature-rich ecommerce platform built with Django and Tailwind CSS. It provides a complete shopping experience for customers while offering comprehensive management tools for administrators.
+**Order2Wear** is a modern, feature-rich ecommerce platform built with Django and Tailwind CSS. It provides a complete shopping experience for customers while offering comprehensive management tools for administrators.
 
 ### 🎯 Purpose
 A full-featured online store where customers can browse products, manage carts, place orders, and admins can manage inventory, shipping, taxes, and promotional campaigns.
@@ -237,8 +237,8 @@ All known issues have been resolved:
 
 ## 📞 Support & Contact
 
-**Email:** support@shophub.com
-**Website:** www.shophub.com
+**Email:** support@order2wear.com
+**Website:** www.order2wear.com
 **Location:** Pakistan
 
 ---

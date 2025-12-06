@@ -1,4 +1,4 @@
-# ShopHub Developer Guide 👨‍💻
+# Order2Wear Developer Guide 👨‍💻
 
 ## Technical Documentation for Developers
 
@@ -566,7 +566,7 @@ ALLOWED_HOSTS = ['yourdomain.com', 'www.yourdomain.com']
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'shophub_db',
+        'NAME': 'order2wear_db',
         'USER': 'db_user',
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'db.example.com',
@@ -654,7 +654,7 @@ For technical help:
 - Review common issues above
 - Check Django docs
 - Search Stack Overflow
-- Contact: dev@shophub.com
+- Contact: dev@order2wear.com
 
 ---
 
