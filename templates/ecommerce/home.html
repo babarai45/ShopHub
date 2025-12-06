@@ -42,18 +42,18 @@
 
     <!-- Stats Section -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-        <div class="grid grid-cols-3 gap-4">
-            <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div class="text-3xl font-bold gradient-text mb-2">10K+</div>
-                <p class="text-gray-600">Products</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center">
+                <div class="text-2xl sm:text-3xl font-bold gradient-text mb-2">10K+</div>
+                <p class="text-sm sm:text-base text-gray-600">Products</p>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div class="text-3xl font-bold gradient-text mb-2">50K+</div>
-                <p class="text-gray-600">Happy Customers</p>
+            <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center">
+                <div class="text-2xl sm:text-3xl font-bold gradient-text mb-2">50K+</div>
+                <p class="text-sm sm:text-base text-gray-600">Happy Customers</p>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                <div class="text-3xl font-bold gradient-text mb-2">24/7</div>
-                <p class="text-gray-600">Support</p>
+            <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg text-center">
+                <div class="text-2xl sm:text-3xl font-bold gradient-text mb-2">24/7</div>
+                <p class="text-sm sm:text-base text-gray-600">Support</p>
             </div>
         </div>
     </div>
@@ -73,18 +73,18 @@
         <div class="relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
                 <!-- Offer Text -->
-                <div>
-                    <p class="text-white text-sm font-semibold mb-2 uppercase tracking-widest">🎉 Limited Time Offer</p>
-                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Save Big!</h2>
-                    <p class="text-white text-opacity-90">Get {{ featured_coupon.discount_value }}% OFF on your purchase</p>
+                <div class="text-center md:text-left">
+                    <p class="text-white text-xs sm:text-sm font-semibold mb-2 uppercase tracking-widest">🎉 Limited Time Offer</p>
+                    <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Save Big!</h2>
+                    <p class="text-sm sm:text-base text-white text-opacity-90">Get {{ featured_coupon.discount_value }}% OFF on your purchase</p>
                 </div>
 
                 <!-- Coupon Code -->
                 <div class="flex justify-center">
-                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-6 border-2 border-white border-opacity-30 text-center">
-                        <p class="text-white text-sm font-semibold mb-3 uppercase">Use Code</p>
-                        <p class="text-white text-4xl font-bold font-mono mb-3 tracking-widest" id="coupon-code">{{ featured_coupon.code }}</p>
-                        <button onclick="copyCoupon('{{ featured_coupon.code }}')" class="bg-white text-pink-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 smooth-transition text-sm">
+                    <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-xl p-4 sm:p-6 border-2 border-white border-opacity-30 text-center w-full">
+                        <p class="text-white text-xs sm:text-sm font-semibold mb-2 sm:mb-3 uppercase">Use Code</p>
+                        <p class="text-white text-2xl sm:text-3xl md:text-4xl font-bold font-mono mb-2 sm:mb-3 tracking-widest break-all" id="coupon-code">{{ featured_coupon.code }}</p>
+                        <button onclick="copyCoupon('{{ featured_coupon.code }}')" class="bg-white text-pink-600 px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-100 smooth-transition text-xs sm:text-sm">
                             <i class="fas fa-copy mr-2"></i>Copy Code
                         </button>
                     </div>
@@ -92,22 +92,22 @@
 
                 <!-- Countdown Timer -->
                 <div class="text-center">
-                    <p class="text-white text-sm font-semibold mb-4 uppercase tracking-widest">⏱️ Offer Ends In</p>
-                    <div class="grid grid-cols-4 gap-2" id="countdown">
-                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
-                            <div class="text-white text-2xl font-bold" id="days">00</div>
+                    <p class="text-white text-xs sm:text-sm font-semibold mb-3 sm:mb-4 uppercase tracking-widest">⏱️ Offer Ends In</p>
+                    <div class="grid grid-cols-4 gap-1 sm:gap-2" id="countdown">
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-2 sm:p-4">
+                            <div class="text-white text-lg sm:text-2xl font-bold" id="days">00</div>
                             <div class="text-white text-xs font-semibold uppercase">Days</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
-                            <div class="text-white text-2xl font-bold" id="hours">00</div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-2 sm:p-4">
+                            <div class="text-white text-lg sm:text-2xl font-bold" id="hours">00</div>
                             <div class="text-white text-xs font-semibold uppercase">Hours</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
-                            <div class="text-white text-2xl font-bold" id="minutes">00</div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-2 sm:p-4">
+                            <div class="text-white text-lg sm:text-2xl font-bold" id="minutes">00</div>
                             <div class="text-white text-xs font-semibold uppercase">Mins</div>
                         </div>
-                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-4">
-                            <div class="text-white text-2xl font-bold" id="seconds">00</div>
+                        <div class="bg-white bg-opacity-20 backdrop-blur-md rounded-lg p-2 sm:p-4">
+                            <div class="text-white text-lg sm:text-2xl font-bold" id="seconds">00</div>
                             <div class="text-white text-xs font-semibold uppercase">Secs</div>
                         </div>
                     </div>
@@ -115,8 +115,8 @@
             </div>
 
             <!-- CTA Button -->
-            <div class="text-center mt-8">
-                <a href="{% url 'ecommerce:product_list' %}" class="inline-block bg-white text-pink-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 smooth-transition text-lg shadow-lg">
+            <div class="text-center mt-6 sm:mt-8">
+                <a href="{% url 'ecommerce:product_list' %}" class="inline-block bg-white text-pink-600 px-6 sm:px-8 py-3 rounded-lg font-bold hover:bg-gray-100 smooth-transition text-base sm:text-lg shadow-lg">
                     Shop Now & Save! →
                 </a>
             </div>
@@ -281,10 +281,10 @@ document.addEventListener('DOMContentLoaded', function() {
 {% endif %}
 
 <!-- Featured Products Section -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-    <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold mb-4">Featured Products</h2>
-        <p class="text-xl text-gray-600">Discover our handpicked selection of amazing products</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+    <div class="text-center mb-8 sm:mb-12">
+        <h2 class="text-3xl sm:text-4xl font-bold mb-3 sm:mb-4">Featured Products</h2>
+        <p class="text-lg sm:text-xl text-gray-600">Discover our handpicked selection of amazing products</p>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -405,42 +405,42 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Features Section -->
-<div class="bg-gray-100 py-20">
+<div class="bg-gray-100 py-12 sm:py-20">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
             <div class="text-center">
-                <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-shipping-fast text-white text-2xl"></i>
+                <div class="w-12 h-12 sm:w-16 sm:h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shipping-fast text-white text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Fast Shipping</h3>
-                <p class="text-gray-600">Quick and reliable delivery to your doorstep within 2-5 business days.</p>
+                <h3 class="text-lg sm:text-xl font-semibold mb-2">Fast Shipping</h3>
+                <p class="text-sm sm:text-base text-gray-600">Quick and reliable delivery to your doorstep within 2-5 business days.</p>
             </div>
             <div class="text-center">
-                <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-lock text-white text-2xl"></i>
+                <div class="w-12 h-12 sm:w-16 sm:h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-lock text-white text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Secure Payment</h3>
-                <p class="text-gray-600">100% secure transactions with encrypted payment gateway protection.</p>
+                <h3 class="text-lg sm:text-xl font-semibold mb-2">Secure Payment</h3>
+                <p class="text-sm sm:text-base text-gray-600">100% secure transactions with encrypted payment gateway protection.</p>
             </div>
             <div class="text-center">
-                <div class="w-16 h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-redo text-white text-2xl"></i>
+                <div class="w-12 h-12 sm:w-16 sm:h-16 gradient-bg rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-redo text-white text-xl sm:text-2xl"></i>
                 </div>
-                <h3 class="text-xl font-semibold mb-2">Easy Returns</h3>
-                <p class="text-gray-600">30-day money-back guarantee for all products. No questions asked.</p>
+                <h3 class="text-lg sm:text-xl font-semibold mb-2">Easy Returns</h3>
+                <p class="text-sm sm:text-base text-gray-600">30-day money-back guarantee for all products. No questions asked.</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- CTA Section -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-    <div class="gradient-bg text-white rounded-lg p-12 text-center">
-        <h2 class="text-3xl font-bold mb-4">Join Our Community</h2>
-        <p class="text-lg mb-8">Get exclusive deals and updates sent straight to your inbox</p>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
+    <div class="gradient-bg text-white rounded-lg p-8 sm:p-12 text-center">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Join Our Community</h2>
+        <p class="text-base sm:text-lg mb-6 sm:mb-8">Get exclusive deals and updates sent straight to your inbox</p>
         <form class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300">
-            <button type="submit" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 smooth-transition">
+            <input type="email" placeholder="Enter your email" class="flex-1 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-300 text-gray-900">
+            <button type="submit" class="bg-white text-blue-600 px-6 sm:px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 smooth-transition">
                 Subscribe
             </button>
         </form>

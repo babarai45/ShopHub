@@ -50,11 +50,11 @@
         <!-- Products Grid -->
         <div class="flex-1">
             <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-4xl font-bold mb-2">Our Products</h1>
-                <p class="text-gray-600">Browse our collection of quality products</p>
+            <div class="mb-6 sm:mb-8">
+                <h1 class="text-3xl sm:text-4xl font-bold mb-2">Our Products</h1>
+                <p class="text-sm sm:text-base text-gray-600">Browse our collection of quality products</p>
                 {% if search_query %}
-                    <p class="text-sm text-gray-500 mt-2">Search results for: <span class="font-semibold">{{ search_query }}</span></p>
+                    <p class="text-xs sm:text-sm text-gray-500 mt-2">Search results for: <span class="font-semibold">{{ search_query }}</span></p>
                 {% endif %}
             </div>
 

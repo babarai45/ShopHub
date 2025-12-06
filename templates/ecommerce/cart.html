@@ -12,53 +12,55 @@
             {% if cart.items.all %}
             <div class="space-y-4">
                 {% for item in cart.items.all %}
-                <div class="bg-white rounded-lg shadow-md p-6 flex gap-4 hover-lift smooth-transition">
-                    <!-- Product Image -->
-                    <div class="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-                        {% if item.product.image %}
-                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
-                        {% else %}
-                            <div class="w-full h-full flex items-center justify-center bg-gray-300">
-                                <i class="fas fa-image text-gray-400"></i>
-                            </div>
-                        {% endif %}
-                    </div>
+                <div class="bg-white rounded-lg shadow-md p-4 sm:p-6 hover-lift smooth-transition">
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <!-- Product Image -->
+                        <div class="w-full sm:w-24 h-32 sm:h-24 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                                    <i class="fas fa-image text-gray-400"></i>
+                                </div>
+                            {% endif %}
+                        </div>
 
-                    <!-- Product Details -->
-                    <div class="flex-1">
-                        <a href="{% url 'ecommerce:product_detail' item.product.slug %}" class="text-lg font-semibold text-gray-800 hover:gradient-text smooth-transition">
-                            {{ item.product.name }}
-                        </a>
-                        <p class="text-gray-600 text-sm mt-1">{{ item.product.description|truncatewords:10 }}</p>
-                        <p class="text-2xl font-bold gradient-text mt-2">₨{{ item.product.price }}</p>
-                    </div>
+                        <!-- Product Details -->
+                        <div class="flex-1">
+                            <a href="{% url 'ecommerce:product_detail' item.product.slug %}" class="text-base sm:text-lg font-semibold text-gray-800 hover:gradient-text smooth-transition">
+                                {{ item.product.name }}
+                            </a>
+                            <p class="text-gray-600 text-sm mt-1 hidden sm:block">{{ item.product.description|truncatewords:10 }}</p>
+                            <p class="text-xl sm:text-2xl font-bold gradient-text mt-2">₨{{ item.product.price }}</p>
+                        </div>
 
-                    <!-- Quantity -->
-                    <div class="flex flex-col items-center justify-between">
-                        <form method="post" action="{% url 'ecommerce:update_cart_item_ajax' item.id %}" class="flex items-center border border-gray-300 rounded-lg qty-form">
-                            {% csrf_token %}
-                            <button type="button" onclick="decreaseQty(this)" class="px-3 py-1 text-gray-600">
-                                <i class="fas fa-minus text-sm"></i>
-                            </button>
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="w-12 text-center border-0 focus:outline-none qty-input" onchange="updateCartAjax(this)">
-                            <button type="button" onclick="increaseQty(this)" class="px-3 py-1 text-gray-600">
-                                <i class="fas fa-plus text-sm"></i>
-                            </button>
-                        </form>
+                        <!-- Quantity and Actions -->
+                        <div class="flex flex-row sm:flex-col items-center justify-between sm:justify-between gap-4">
+                            <form method="post" action="{% url 'ecommerce:update_cart_item_ajax' item.id %}" class="flex items-center border border-gray-300 rounded-lg qty-form">
+                                {% csrf_token %}
+                                <button type="button" onclick="decreaseQty(this)" class="px-3 py-1 text-gray-600">
+                                    <i class="fas fa-minus text-sm"></i>
+                                </button>
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="w-12 text-center border-0 focus:outline-none qty-input" onchange="updateCartAjax(this)">
+                                <button type="button" onclick="increaseQty(this)" class="px-3 py-1 text-gray-600">
+                                    <i class="fas fa-plus text-sm"></i>
+                                </button>
+                            </form>
 
-                        <!-- Remove Button -->
-                        <form method="post" action="{% url 'ecommerce:remove_from_cart' item.id %}" class="mt-4">
-                            {% csrf_token %}
-                            <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-semibold">
-                                <i class="fas fa-trash mr-1"></i>Remove
-                            </button>
-                        </form>
-                    </div>
+                            <!-- Remove Button -->
+                            <form method="post" action="{% url 'ecommerce:remove_from_cart' item.id %}" class="sm:mt-4">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-semibold">
+                                    <i class="fas fa-trash mr-1"></i>Remove
+                                </button>
+                            </form>
+                        </div>
 
-                    <!-- Subtotal -->
-                    <div class="text-right">
-                        <p class="text-sm text-gray-600">Subtotal</p>
-                        <p class="text-2xl font-bold gradient-text">₨{{ item.get_total }}</p>
+                        <!-- Subtotal -->
+                        <div class="text-right sm:text-right">
+                            <p class="text-xs sm:text-sm text-gray-600">Subtotal</p>
+                            <p class="text-xl sm:text-2xl font-bold gradient-text">₨{{ item.get_total }}</p>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}
@@ -85,8 +87,8 @@
 
         <!-- Order Summary -->
         <div>
-            <div class="bg-white rounded-lg shadow-lg p-6 sticky top-20 h-fit">
-                <h2 class="text-2xl font-bold mb-6">Order Summary</h2>
+            <div class="bg-white rounded-lg shadow-lg p-4 sm:p-6 lg:sticky lg:top-20 h-fit">
+                <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Order Summary</h2>
 
                 <div class="space-y-4 border-b pb-6 mb-6">
                     <div class="flex justify-between">

@@ -39,11 +39,11 @@
             </div>
 
             <!-- Title -->
-            <h1 class="text-4xl font-bold mb-4">{{ product.name }}</h1>
+            <h1 class="text-3xl sm:text-4xl font-bold mb-4">{{ product.name }}</h1>
 
             <!-- Rating (Actual) -->
             <div class="flex items-center space-x-2 mb-4">
-                <div class="flex text-yellow-400">
+                <div class="flex text-yellow-400 text-sm sm:text-base">
                     {% if product.rating > 0 %}
                         {% for i in "x"|rjust:"5" %}
                             {% if forloop.counter <= product.rating %}
@@ -60,28 +60,28 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                <span class="text-xl font-bold">{{ product.rating|default:"0" }}</span>
-                <span class="text-gray-600">({{ product.total_reviews }} reviews)</span>
+                <span class="text-lg sm:text-xl font-bold">{{ product.rating|default:"0" }}</span>
+                <span class="text-sm sm:text-base text-gray-600">({{ product.total_reviews }} reviews)</span>
             </div>
 
             <!-- Price with Discount -->
             <div class="mb-6">
-                <span class="text-5xl font-bold gradient-text">₨{{ product.price }}</span>
+                <span class="text-3xl sm:text-4xl md:text-5xl font-bold gradient-text">₨{{ product.price }}</span>
                 {% if product.original_price %}
-                    <span class="text-gray-600 line-through ml-4 text-xl">₨{{ product.original_price }}</span>
-                    <span class="bg-red-100 text-red-700 px-3 py-1 rounded ml-2 font-bold">Save {{ product.get_discount_percentage }}%</span>
+                    <span class="text-gray-600 line-through ml-2 sm:ml-4 text-base sm:text-xl">₨{{ product.original_price }}</span>
+                    <span class="bg-red-100 text-red-700 px-2 sm:px-3 py-1 rounded ml-2 font-bold text-xs sm:text-base">Save {{ product.get_discount_percentage }}%</span>
                 {% endif %}
             </div>
 
             <!-- Stock & Sales Info -->
-            <div class="grid grid-cols-2 gap-4 mb-6">
-                <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <p class="text-gray-600 text-sm mb-2">Total Sold</p>
-                    <p class="text-2xl font-bold text-blue-600">{{ product.total_sold }}</p>
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-6">
+                <div class="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <p class="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Total Sold</p>
+                    <p class="text-xl sm:text-2xl font-bold text-blue-600">{{ product.total_sold }}</p>
                 </div>
-                <div class="p-4 rounded-lg bg-gray-50 border border-gray-200">
-                    <p class="text-gray-600 text-sm mb-2">Customer Reviews</p>
-                    <p class="text-2xl font-bold text-blue-600">{{ product.total_reviews }}</p>
+                <div class="p-3 sm:p-4 rounded-lg bg-gray-50 border border-gray-200">
+                    <p class="text-gray-600 text-xs sm:text-sm mb-1 sm:mb-2">Customer Reviews</p>
+                    <p class="text-xl sm:text-2xl font-bold text-blue-600">{{ product.total_reviews }}</p>
                 </div>
             </div>
 
@@ -100,38 +100,38 @@
 
             <!-- Description -->
             <div class="mb-8">
-                <h3 class="text-xl font-semibold mb-3">Description</h3>
-                <p class="text-gray-700 leading-relaxed">{{ product.description }}</p>
+                <h3 class="text-lg sm:text-xl font-semibold mb-3">Description</h3>
+                <p class="text-sm sm:text-base text-gray-700 leading-relaxed">{{ product.description }}</p>
             </div>
 
             <!-- Add to Cart Form -->
             {% if product.stock > 0 and user.is_authenticated %}
             <form method="post" action="{% url 'ecommerce:add_to_cart' product.id %}" class="space-y-4">
                 {% csrf_token %}
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center border border-gray-300 rounded-lg">
-                        <button type="button" onclick="decreaseQty()" class="px-4 py-2 text-gray-600 hover:bg-gray-100">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
+                    <div class="flex items-center border border-gray-300 rounded-lg w-full sm:w-auto">
+                        <button type="button" onclick="decreaseQty()" class="px-3 sm:px-4 py-2 text-gray-600 hover:bg-gray-100">
                             <i class="fas fa-minus"></i>
                         </button>
                         <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock }}"
                             class="w-16 text-center border-0 focus:outline-none" onchange="validateQty()">
-                        <button type="button" onclick="increaseQty()" class="px-4 py-2 text-gray-600 hover:bg-gray-100">
+                        <button type="button" onclick="increaseQty()" class="px-3 sm:px-4 py-2 text-gray-600 hover:bg-gray-100">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
-                    <span class="text-sm text-gray-600">Max: {{ product.stock }} available</span>
+                    <span class="text-xs sm:text-sm text-gray-600">Max: {{ product.stock }} available</span>
                 </div>
 
-                <button type="submit" class="w-full gradient-bg text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg smooth-transition">
+                <button type="submit" class="w-full gradient-bg text-white py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:shadow-lg smooth-transition">
                     <i class="fas fa-shopping-cart mr-2"></i>Add to Cart
                 </button>
             </form>
             {% elif not user.is_authenticated %}
-            <a href="{% url 'ecommerce:login' %}" class="block w-full gradient-bg text-white py-4 rounded-lg font-bold text-lg hover:shadow-lg smooth-transition text-center">
+            <a href="{% url 'ecommerce:login' %}" class="block w-full gradient-bg text-white py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg hover:shadow-lg smooth-transition text-center">
                 <i class="fas fa-shopping-cart mr-2"></i>Login to Buy
             </a>
             {% else %}
-            <button disabled class="w-full bg-gray-300 text-gray-600 py-4 rounded-lg font-bold text-lg">
+            <button disabled class="w-full bg-gray-300 text-gray-600 py-3 sm:py-4 rounded-lg font-bold text-base sm:text-lg">
                 Out of Stock
             </button>
             {% endif %}
@@ -140,24 +140,24 @@
             <div class="mt-6 space-y-3 border-t pt-6">
                 {% if user.is_authenticated %}
                     {% if user.wishlist.products.all|length > 0 and product in user.wishlist.products.all %}
-                        <a href="{% url 'ecommerce:remove_from_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 smooth-transition font-semibold">
+                        <a href="{% url 'ecommerce:remove_from_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-2 sm:py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 smooth-transition font-semibold text-sm sm:text-base">
                             <i class="fas fa-heart"></i>
                             <span>Remove from Wishlist</span>
                         </a>
                     {% else %}
-                        <a href="{% url 'ecommerce:add_to_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold">
+                        <a href="{% url 'ecommerce:add_to_wishlist' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-2 sm:py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold text-sm sm:text-base">
                             <i class="far fa-heart"></i>
                             <span>Add to Wishlist</span>
                         </a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'ecommerce:login' %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold">
+                    <a href="{% url 'ecommerce:login' %}" class="w-full flex items-center justify-center space-x-2 px-4 py-2 sm:py-3 border-2 border-red-500 text-red-500 rounded-lg hover:bg-red-50 smooth-transition font-semibold text-sm sm:text-base">
                         <i class="far fa-heart"></i>
                         <span>Login to Wishlist</span>
                     </a>
                 {% endif %}
                 
-                <a href="{% url 'ecommerce:share_product' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-3 border-2 border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 smooth-transition font-semibold">
+                <a href="{% url 'ecommerce:share_product' product.id %}" class="w-full flex items-center justify-center space-x-2 px-4 py-2 sm:py-3 border-2 border-blue-500 text-blue-500 rounded-lg hover:bg-blue-50 smooth-transition font-semibold text-sm sm:text-base">
                     <i class="fas fa-share-alt"></i>
                     <span>Share Product</span>
                 </a>
@@ -167,8 +167,8 @@
 
     <!-- Related Products -->
     {% if related_products %}
-    <div class="mt-20">
-        <h2 class="text-3xl font-bold mb-8">Related Products</h2>
+    <div class="mt-12 sm:mt-20">
+        <h2 class="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">Related Products</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for rel_product in related_products %}
             <div class="bg-white rounded-lg shadow-md hover-lift smooth-transition overflow-hidden">
