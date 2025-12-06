@@ -233,8 +233,12 @@ def cart_view(request):
         cart = Cart.objects.create(user=request.user)
 
     # Get admin-configured shipping and tax
-    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    # First try to get default tax rate, if not available get any active tax rate
     tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+    if not tax_rate:
+        tax_rate = TaxRate.objects.filter(is_active=True).first()
+
+    shipping_method = ShippingMethod.objects.filter(is_active=True).first()
 
     subtotal = Decimal(str(cart.get_total()))
     shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
@@ -370,7 +374,10 @@ def update_cart_item_ajax(request, cart_item_id):
 
         cart = cart_item.cart
         shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        # First try to get default tax rate, if not available get any active tax rate
         tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+        if not tax_rate:
+            tax_rate = TaxRate.objects.filter(is_active=True).first()
 
         subtotal = Decimal(str(cart.get_total()))
         shipping = Decimal(str(shipping_method.price)) if shipping_method else Decimal('0.00')
@@ -567,7 +574,10 @@ def checkout(request):
         # Get admin-configured shipping and tax
         from .models import ShippingMethod, TaxRate
         shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        # First try to get default tax rate, if not available get any active tax rate
         tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+        if not tax_rate:
+            tax_rate = TaxRate.objects.filter(is_active=True).first()
 
         # Calculate totals
         subtotal = Decimal(str(cart.get_total()))
@@ -630,7 +640,10 @@ def checkout(request):
     # Get admin-configured shipping and tax
     from .models import ShippingMethod, TaxRate
     shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+    # First try to get default tax rate, if not available get any active tax rate
     tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+    if not tax_rate:
+        tax_rate = TaxRate.objects.filter(is_active=True).first()
 
     # Calculate totals
     subtotal = Decimal(str(cart.get_total()))
@@ -714,7 +727,10 @@ def apply_coupon(request):
         # Get admin-configured shipping and tax
         from .models import ShippingMethod, TaxRate
         shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        # First try to get default tax rate, if not available get any active tax rate
         tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+        if not tax_rate:
+            tax_rate = TaxRate.objects.filter(is_active=True).first()
 
         # Recalculate totals
         subtotal_with_coupon = subtotal - coupon_discount
@@ -762,7 +778,10 @@ def remove_coupon(request):
         # Get admin-configured shipping and tax
         from .models import ShippingMethod, TaxRate
         shipping_method = ShippingMethod.objects.filter(is_active=True).first()
+        # First try to get default tax rate, if not available get any active tax rate
         tax_rate = TaxRate.objects.filter(is_active=True, is_default=True).first()
+        if not tax_rate:
+            tax_rate = TaxRate.objects.filter(is_active=True).first()
 
         # Recalculate totals without coupon using admin config
         subtotal = Decimal(str(cart.get_total()))
