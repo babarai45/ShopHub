@@ -567,9 +567,22 @@ def checkout(request):
             del request.session['applied_coupon']
 
     if request.method == 'POST':
-        # Get form data
-        payment_method = request.POST.get('payment_method', 'card')
-        shipping_address = request.POST.get('shipping_address', '')
+        # Get form data for shipping information
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        shipping_address = request.POST.get('shipping_address', '').strip()
+        city = request.POST.get('city', '').strip()
+        state = request.POST.get('state', '').strip()
+        postal_code = request.POST.get('postal_code', '').strip()
+        country = request.POST.get('country', '').strip()
+        payment_method = request.POST.get('payment_method', 'cod')
+
+        # Validate required fields
+        if not all([first_name, last_name, email, phone, shipping_address, city, state, postal_code, country]):
+            messages.error(request, 'Please fill in all required shipping information fields.')
+            return redirect('ecommerce:checkout')
 
         # Get admin-configured shipping and tax
         from .models import ShippingMethod, TaxRate
@@ -591,7 +604,7 @@ def checkout(request):
 
         total_amount = subtotal_with_coupon + shipping + tax_amount
 
-        # Create order with references to shipping and tax
+        # Create order with shipping information and references to shipping and tax
         order = Order.objects.create(
             user=request.user,
             shipping_method=shipping_method,
@@ -620,20 +633,26 @@ def checkout(request):
             applied_coupon.apply()
             del request.session['applied_coupon']
 
-        # Process payment (dummy integration)
+        # Process payment
         if payment_method == 'card':
-            # Simulate payment processing
-            # In production, integrate with Stripe, PayPal, etc.
+            # Credit card (currently disabled in frontend)
             order.status = 'completed'
             order.save(update_fields=['status'])
-
-            # Clear cart
             cart.items.all().delete()
-
             messages.success(request, f'Order #{order.id} placed successfully! Payment processed.')
             return redirect('ecommerce:order_detail', order_id=order.id)
+        elif payment_method == 'cod':
+            # Cash on Delivery (Only enabled payment method)
+            order.status = 'pending'
+            order.save(update_fields=['status'])
+            cart.items.all().delete()
+            messages.success(request, f'Order #{order.id} placed! We will contact you for payment confirmation.')
+            return redirect('ecommerce:order_detail', order_id=order.id)
         else:
-            # Other payment methods (COD, etc.)
+            # Any other payment method (currently disabled)
+            order.status = 'pending'
+            order.save(update_fields=['status'])
+            cart.items.all().delete()
             messages.success(request, f'Order #{order.id} placed! Awaiting payment verification.')
             return redirect('ecommerce:order_detail', order_id=order.id)
 
