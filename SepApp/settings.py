@@ -183,27 +183,210 @@
 
 
 # =========================
+#
+# from pathlib import Path
+# import os
+# import dj_database_url
+# import cloudinary
+# import cloudinary.uploader
+# import cloudinary.api
+#
+# # Base directory
+# BASE_DIR = Path(__file__).resolve().parent.parent
+#
+# # Security
+# SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
+#
+# # Local pe by default True, Railway pe env me DEBUG=False rakhoge
+# DEBUG = os.environ.get("DEBUG", "True") == "True"
+#
+# # Railway pe: ALLOWED_HOSTS env se aa jayega
+# # ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split()
+#
+# # Application definition
+# INSTALLED_APPS = [
+#     "django.contrib.admin",
+#     "django.contrib.auth",
+#     "django.contrib.contenttypes",
+#     "django.contrib.sessions",
+#     "django.contrib.messages",
+#     "django.contrib.staticfiles",
+#
+#     "ecommerce",
+#     "widget_tweaks",
+#     "django.contrib.sites",
+#     "allauth",
+#     "allauth.account",
+#     "allauth.socialaccount",
+#     "allauth.socialaccount.providers.google",
+#
+#     "cloudinary",
+#     "cloudinary_storage",
+# ]
+#
+# SITE_ID = 1
+#
+# ALLOWED_HOSTS = [
+#     ".up.railway.app",
+#     ".railway.app",
+#     "order2wera.pk",
+#     "www.order2wera.pk",
+# ]
+#
+#
+# MIDDLEWARE = [
+#     "django.middleware.security.SecurityMiddleware",
+#     "whitenoise.middleware.WhiteNoiseMiddleware",  # static files for Railway
+#     "django.contrib.sessions.middleware.SessionMiddleware",
+#     "django.middleware.common.CommonMiddleware",
+#     "django.middleware.csrf.CsrfViewMiddleware",
+#     "django.contrib.auth.middleware.AuthenticationMiddleware",
+#     "django.contrib.messages.middleware.MessageMiddleware",
+#     "allauth.account.middleware.AccountMiddleware",
+#     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+# ]
+#
+# ROOT_URLCONF = "SepApp.urls"
+#
+# TEMPLATES = [
+#     {
+#         "BACKEND": "django.template.backends.django.DjangoTemplates",
+#         "DIRS": [BASE_DIR / "templates"],
+#         "APP_DIRS": True,
+#         "OPTIONS": {
+#             "context_processors": [
+#                 "django.template.context_processors.request",
+#                 "django.contrib.auth.context_processors.auth",
+#                 "django.contrib.messages.context_processors.messages",
+#             ],
+#         },
+#     },
+# ]
+#
+# WSGI_APPLICATION = "SepApp.wsgi.application"
+#
+# # Database: Railway PostgreSQL via DATABASE_URL, fallback SQLite for local
+# DATABASES = {
+#     "default": dj_database_url.config(
+#         conn_max_age=600,
+#         ssl_require=True,
+#     )
+# }
+#
+#
+# # Password validation
+# AUTH_PASSWORD_VALIDATORS = [
+#     {
+#         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+#     },
+#     {
+#         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+#     },
+# ]
+#
+# # Internationalization
+# LANGUAGE_CODE = "en-us"
+# TIME_ZONE = "UTC"   # chaaho to Asia/Karachi kar sakte ho
+# USE_I18N = True
+# USE_TZ = True
+#
+# # Static files
+# STATIC_URL = "/static/"
+# STATIC_ROOT = BASE_DIR / "staticfiles"
+# STATICFILES_DIRS = [BASE_DIR / "static"]
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+#
+# # Media files via Cloudinary (images ab yahan safe rahengi)
+# DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+# MEDIA_URL = "/media/"
+#
+# CLOUDINARY_STORAGE = {
+#     "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
+#     "API_KEY": os.environ.get("CLOUDINARY_API_KEY", ""),
+#     "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", ""),
+# }
+#
+# DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+#
+# # Authentication URLs
+# LOGIN_URL = "login"
+# LOGIN_REDIRECT_URL = "home"
+# LOGOUT_REDIRECT_URL = "home"
+#
+# # Allauth settings
+# AUTHENTICATION_BACKENDS = [
+#     "django.contrib.auth.backends.ModelBackend",
+#     "allauth.account.auth_backends.AuthenticationBackend",
+# ]
+#
+# SOCIALACCOUNT_PROVIDERS = {
+#     "google": {
+#         "SCOPE": [
+#             "profile",
+#             "email",
+#         ],
+#         "AUTH_PARAMS": {
+#             "access_type": "online",
+#         },
+#     }
+# }
+#
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+#
+# # Password reset link timeout (in seconds) - 1 hour
+# PASSWORD_RESET_TIMEOUT = 3600
+#
+# # Allauth signup config
+# ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+# ACCOUNT_EMAIL_VERIFICATION = "optional"
+# SOCIALACCOUNT_AUTO_SIGNUP = True
+# SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
+#
+# # Reverse proxy/HTTPS (Railway)
+# SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# CSRF_TRUSTED_ORIGINS = [
+#     "https://order2wera.pk",
+#     "https://www.order2wera.pk",
+# ]
+#
+
+
+# ===============
+
+# final
 
 from pathlib import Path
 import os
 import dj_database_url
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
 
+# --------------------------------------------------
 # Base directory
+# --------------------------------------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# --------------------------------------------------
 # Security
+# --------------------------------------------------
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key-change-me")
 
-# Local pe by default True, Railway pe env me DEBUG=False rakhoge
-DEBUG = os.environ.get("DEBUG", "True") == "True"
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-# Railway pe: ALLOWED_HOSTS env se aa jayega
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "localhost 127.0.0.1").split()
+ALLOWED_HOSTS = [
+    ".up.railway.app",
+    ".railway.app",
+    "order2wera.pk",
+    "www.order2wera.pk",
+]
 
-# Application definition
+# --------------------------------------------------
+# Applications
+# --------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -212,7 +395,10 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
+    # Apps
     "ecommerce",
+
+    # Third-party
     "widget_tweaks",
     "django.contrib.sites",
     "allauth",
@@ -220,15 +406,19 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
 
+    # Cloudinary
     "cloudinary",
     "cloudinary_storage",
 ]
 
 SITE_ID = 1
 
+# --------------------------------------------------
+# Middleware
+# --------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",  # static files for Railway
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -238,6 +428,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# --------------------------------------------------
+# URLs / Templates
+# --------------------------------------------------
 ROOT_URLCONF = "SepApp.urls"
 
 TEMPLATES = [
@@ -257,7 +450,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "SepApp.wsgi.application"
 
-# Database: Railway PostgreSQL via DATABASE_URL, fallback SQLite for local
+# --------------------------------------------------
+# Database (Railway PostgreSQL)
+# --------------------------------------------------
 DATABASES = {
     "default": dj_database_url.config(
         conn_max_age=600,
@@ -265,85 +460,89 @@ DATABASES = {
     )
 }
 
-
+# --------------------------------------------------
 # Password validation
+# --------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# --------------------------------------------------
 # Internationalization
+# --------------------------------------------------
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"   # chaaho to Asia/Karachi kar sakte ho
+TIME_ZONE = "Asia/Karachi"
 USE_I18N = True
 USE_TZ = True
 
-# Static files
+# --------------------------------------------------
+# Static files (WhiteNoise)
+# --------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# Media files via Cloudinary (images ab yahan safe rahengi)
+# --------------------------------------------------
+# Media files (Cloudinary)
+# --------------------------------------------------
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
 MEDIA_URL = "/media/"
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", ""),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", ""),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", ""),
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET"),
 }
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# Authentication URLs
+# --------------------------------------------------
+# Authentication
+# --------------------------------------------------
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
-# Allauth settings
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "SCOPE": [
-            "profile",
-            "email",
-        ],
-        "AUTH_PARAMS": {
-            "access_type": "online",
-        },
-    }
-}
-
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
-# Password reset link timeout (in seconds) - 1 hour
-PASSWORD_RESET_TIMEOUT = 3600
-
-# Allauth signup config
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 ACCOUNT_EMAIL_VERIFICATION = "optional"
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_VERIFICATION = "optional"
 
-# Reverse proxy/HTTPS (Railway)
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
+}
+
+# --------------------------------------------------
+# Email (dev)
+# --------------------------------------------------
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+PASSWORD_RESET_TIMEOUT = 3600
+
+# --------------------------------------------------
+# Security (Production)
+# --------------------------------------------------
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 CSRF_TRUSTED_ORIGINS = [
     "https://order2wera.pk",
     "https://www.order2wera.pk",
 ]
 
+# --------------------------------------------------
+# Default PK
+# --------------------------------------------------
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
