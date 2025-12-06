@@ -260,10 +260,11 @@ WSGI_APPLICATION = "SepApp.wsgi.application"
 # Database: Railway PostgreSQL via DATABASE_URL, fallback SQLite for local
 DATABASES = {
     "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
         conn_max_age=600,
+        ssl_require=True,
     )
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
